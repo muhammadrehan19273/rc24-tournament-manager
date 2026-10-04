@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC24 Tournament Manager</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#07111f;
+  color:#fff;
+}
+
+header{
+  background:#0b1b2e;
+  padding:18px;
+  text-align:center;
+  border-bottom:2px solid #16a34a;
+}
+
+header h1{
+  margin:0;
+  color:#22c55e;
+  font-size:24px;
+}
+
+header p{
+  margin:6px 0 0;
+  color:#9ca3af;
+  font-size:13px;
+}
+
+nav{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding:10px;
+  background:#0a1626;
+}
+
+nav button{
+  flex:0 0 auto;
+  background:#12243a;
+  color:#fff;
+  border:1px solid #23415f;
+  padding:10px 14px;
+  border-radius:8px;
+}
+
+nav button.active{
+  background:#16a34a;
+  border-color:#16a34a;
+}
+
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:16px;
+}
+
+.card{
+  background:#0d1d31;
+  border:1px solid #203b57;
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:16px;
+}
+
+h2,h3{
+  margin-top:0;
+}
+
+input,select{
+  width:100%;
+  padding:12px;
+  margin:7px 0;
+  border-radius:8px;
+  border:1px solid #31516e;
+  background:#081525;
+  color:#fff;
+  font-size:15px;
+}
+
+button{
+  cursor:pointer;
+  border:0;
+  border-radius:8px;
+  padding:11px 15px;
+  background:#16a34a;
+  color:white;
+  font-weight:bold;
+}
+
+button.secondary{
+  background:#2563eb;
+}
+
+button.danger{
+  background:#dc2626;
+}
+
+button.gray{
+  background:#475569;
+}
+
+button.small{
+  padding:7px 10px;
+  font-size:12px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:12px;
+}
+
+.stat{
+  background:#12243a;
+  padding:18px;
+  border-radius:10px;
+  text-align:center;
+}
+
+.stat strong{
+  display:block;
+  font-size:25px;
+  color:#22c55e;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.muted{
+  color:#94a3b8;
+}
+
+.success{
+  color:#4ade80;
+}
+
+.error{
+  color:#f87171;
+}
+
+.warning{
+  color:#facc15;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+  min-width:600px;
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #263d54;
+  text-align:center;
+}
+
+th{
+  background:#12243a;
+  color:#22c55e;
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+.team-row,.tournament-row,.match-row{
+  background:#12243a;
+  padding:12px;
+  border-radius:9px;
+  margin:8px 0;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:20px;
+  background:#14532d;
+  color:#86efac;
+  font-size:11px;
+}
+
+.auth-box{
+  max-width:450px;
+  margin:40px auto;
+}
+
+.public-header{
+  text-align:center;
+  padding:25px 10px;
+}
+
+.logo{
+  font-size:30px;
+  font-weight:bold;
+  color:#22c55e;
+}
+
+hr{
+  border:0;
+  border-top:1px solid #243b53;
+  margin:18px 0;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🏏 RC24 TOURNAMENTS</h1>
+  <p>Free Cricket Tournament Manager</p>
+</header>
+
+<!-- AUTH -->
+<div id="authScreen" class="container">
+  <div class="card auth-box">
+
+    <div id="loginBox">
+      <h2>🔐 Organizer Login</h2>
+      <p class="muted">Login to manage your tournaments.</p>
+
+      <input id="loginEmail" type="email" placeholder="Email">
+      <input id="loginPassword" type="password" placeholder="Password">
+
+      <button onclick="login()">Login</button>
+      <button class="gray" onclick="showRegister()">Create Admin Account</button>
+
+      <p id="loginMsg"></p>
+    </div>
+
+    <div id="registerBox" class="hidden">
+      <h2>📝 Create Account</h2>
+      <p class="muted">
+        Email can be your Gmail, but use a new RC24 password.
+      </p>
+
+      <input id="regEmail" type="email" placeholder="Email">
+      <input id="regPassword" type="password" placeholder="New RC24 password">
+
+      <button onclick="register()">Create Account</button>
+      <button class="gray" onclick="showLogin()">Back to Login</button>
+
+      <p id="registerMsg"></p>
+    </div>
+
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appScreen" class="hidden">
+
+<nav>
+  <button id="navDashboard" onclick="showSection('dashboard')">Dashboard</button>
+  <button id="navTournaments" onclick="showSection('tournaments')">Tournaments</button>
+  <button id="navTeams" onclick="showSection('teams')">Teams</button>
+  <button id="navMatches" onclick="showSection('matches')">Match Scoring</button>
+  <button id="navPoints" onclick="showSection('points')">Points Table</button>
+  <button onclick="logout()">Logout</button>
+</nav>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+<section id="dashboard" class="section">
+
+  <div class="card">
+    <h2>🏏 Welcome to RC24</h2>
+    <p class="muted" id="userEmail"></p>
+  </div>
+
+  <div class="grid">
+    <div class="stat">
+      <strong id="dashTournaments">0</strong>
+      Tournaments
+    </div>
+
+    <div class="stat">
+      <strong id="dashTeams">0</strong>
+      Teams
+    </div>
+
+    <div class="stat">
+      <strong id="dashMatches">0</strong>
+      Matches
+    </div>
+  </div>
+
+</section>
+
+<!-- TOURNAMENTS -->
+<section id="tournaments" class="section hidden">
+
+  <div class="card">
+    <h2>🏆 Create Tournament</h2>
+
+    <input id="tournamentName" placeholder="Tournament name">
+
+    <select id="tournamentFormat">
+      <option value="League">League</option>
+      <option value="Knockout">Knockout</option>
+      <option value="League + Knockout">League + Knockout</option>
+    </select>
+
+    <input id="tournamentOvers" type="number" min="1" value="10" placeholder="Overs">
+
+    <button onclick="createTournament()">Create Tournament</button>
+
+    <p id="tournamentMsg"></p>
+  </div>
+
+  <div class="card">
+    <h2>My Tournaments</h2>
+    <div id="tournamentList"></div>
+  </div>
+
+</section>
+
+<!-- TEAMS -->
+<section id="teams" class="section hidden">
+
+  <div class="card">
+    <h2>👥 Add Team</h2>
+
+    <label class="muted">Choose Tournament</label>
+
+    <!-- FIXED TOURNAMENT DROPDOWN -->
+    <select id="teamTournament">
+      <option value="">Choose Tournament</option>
+    </select>
+
+    <input id="teamName" placeholder="Team name">
+
+    <button onclick="addTeam()">Add Team</button>
+
+    <p id="teamMsg"></p>
+  </div>
+
+  <div class="card">
+    <h2>Teams</h2>
+    <div id="teamList"></div>
+  </div>
+
+</section>
+
+<!-- MATCHES -->
+<section id="matches" class="section hidden">
+
+  <div class="card">
+    <h2>🏏 Match Scoring</h2>
+
+    <label class="muted">Tournament</label>
+    <select id="matchTournament" onchange="loadMatchTeams()">
+      <option value="">Choose Tournament</option>
+    </select>
+
+    <label class="muted">Team A</label>
+    <select id="matchTeamA">
+      <option value="">Choose Team A</option>
+    </select>
+
+    <label class="muted">Team B</label>
+    <select id="matchTeamB">
+      <option value="">Choose Team B</option>
+    </select>
+
+    <input id="runsA" type="number" min="0" placeholder="Team A Runs">
+    <input id="wicketsA" type="number" min="0" max="10" placeholder="Team A Wickets">
+    <input id="oversA" type="number" min="0" step="0.1" placeholder="Team A Overs">
+
+    <hr>
+
+    <input id="runsB" type="number" min="0" placeholder="Team B Runs">
+    <input id="wicketsB" type="number" min="0" max="10" placeholder="Team B Wickets">
+    <input id="oversB" type="number" min="0" step="0.1" placeholder="Team B Overs">
+
+    <select id="matchResult">
+      <option value="normal">Normal Match</option>
+      <option value="tie">Tie</option>
+      <option value="noresult">No Result</option>
+    </select>
+
+    <button onclick="addMatch()">Save Match</button>
+
+    <p id="matchMsg"></p>
+  </div>
+
+  <div class="card">
+    <h2>Matches</h2>
+    <div id="matchList"></div>
+  </div>
+
+</section>
+
+<!-- POINTS -->
+<section id="points" class="section hidden">
+
+  <div class="card">
+    <h2>📊 Points Table</h2>
+
+    <select id="pointsTournament" onchange="renderPoints()">
+      <option value="">Choose Tournament</option>
+    </select>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Team</th>
+            <th>P</th>
+            <th>W</th>
+            <th>L</th>
+            <th>T</th>
+            <th>NR</th>
+            <th>Pts</th>
+            <th>NRR</th>
+          </tr>
+        </thead>
+        <tbody id="pointsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</section>
+
+</div>
+</div>
+
+<!-- PUBLIC PAGE -->
+<div id="publicScreen" class="hidden">
+
+  <div class="container">
+
+    <div class="public-header">
+      <div class="logo">🏏 RC24</div>
+      <h1 id="publicTitle">Tournament</h1>
+      <p id="publicInfo" class="muted"></p>
+    </div>
+
+    <div class="card">
+      <h2>👥 Teams</h2>
+      <div id="publicTeams"></div>
+    </div>
+
+    <div class="card">
+      <h2>🏏 Matches</h2>
+      <div id="publicMatches"></div>
+    </div>
+
+    <div class="card">
+      <h2>📊 Points Table</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>P</th>
+              <th>W</th>
+              <th>L</th>
+              <th>T</th>
+              <th>NR</th>
+              <th>Pts</th>
+              <th>NRR</th>
+            </tr>
+          </thead>
+          <tbody id="publicPointsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <button onclick="createOwnTournament()">
+        🚀 Create Your Own Tournament
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  query,
+  where
+}
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+/* =========================
+   FIREBASE CONFIG
+========================= */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAip691d5wq_wnLaHaRf8KDEZKuBTdZJQ4",
+  authDomain: "rc-24-tournaments-manager.firebaseapp.com",
+  projectId: "rc-24-tournaments-manager",
+  storageBucket: "rc-24-tournaments-manager.firebasestorage.app",
+  messagingSenderId: "1016928758189",
+  appId: "1:1016928758189:web:f4cb284d9a38bddc895924"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let tournaments = [];
+let publicTournament = null;
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function id(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+}
+
+function esc(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function msg(id,text,type="success"){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=text;
+  el.className=type;
+}
+
+function firebaseError(error){
+
+  if(error.code==="auth/email-already-in-use")
+    return "This email already has an account. Login instead.";
+
+  if(error.code==="auth/invalid-email")
+    return "Enter a valid email address.";
+
+  if(error.code==="auth/weak-password")
+    return "Password must be at least 6 characters.";
+
+  if(error.code==="auth/invalid-credential")
+    return "Email or password is incorrect.";
+
+  return error.message || "Something went wrong.";
+}
+
+
+/* =========================
+   AUTH UI
+========================= */
+
+window.showRegister=function(){
+
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("registerBox").classList.remove("hidden");
+
+};
+
+window.showLogin=function(){
+
+  document.getElementById("registerBox").classList.add("hidden");
+  document.getElementById("loginBox").classList.remove("hidden");
+
+};
+
+
+/* =========================
+   REGISTER
+========================= */
+
+window.register=async function(){
+
+  const email=document.getElementById("regEmail").value.trim();
+  const password=document.getElementById("regPassword").value;
+
+  if(!email || !password){
+    msg("registerMsg","Email and password required.","error");
+    return;
+  }
+
+  try{
+
+    await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    msg("registerMsg","Account created successfully!","success");
+
+  }catch(error){
+
+    msg("registerMsg",firebaseError(error),"error");
+
+  }
+
+};
+
+
+/* =========================
+   LOGIN
+========================= */
+
+window.login=async function(){
+
+  const email=document.getElementById("loginEmail").value.trim();
+  const password=document.getElementById("loginPassword").value;
+
+  if(!email || !password){
+    msg("loginMsg","Email and password required.","error");
+    return;
+  }
+
+  try{
+
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+  }catch(error){
+
+    msg("loginMsg",firebaseError(error),"error");
+
+  }
+
+};
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+window.logout=async function(){
+
+  await signOut(auth);
+
+};
+
+
+/* =========================
+   AUTH STATE
+========================= */
+
+onAuthStateChanged(auth, async user=>{
+
+  currentUser=user;
+
+  if(user){
+
+    document.getElementById("authScreen").classList.add("hidden");
+    document.getElementById("appScreen").classList.remove("hidden");
+    document.getElementById("publicScreen").classList.add("hidden");
+
+    document.getElementById("userEmail").textContent=
+      user.email || "";
+
+    await loadTournaments();
+
+    showSection("dashboard");
+
+  }else{
+
+    document.getElementById("authScreen").classList.remove("hidden");
+    document.getElementById("appScreen").classList.add("hidden");
+
+  }
+
+});
+
+
+/* =========================
+   LOAD TOURNAMENTS
+========================= */
+
+async function loadTournaments(){
+
+  if(!currentUser)return;
+
+  const q=query(
+    collection(db,"tournaments"),
+    where("ownerId","==",currentUser.uid)
+  );
+
+  const snap=await getDocs(q);
+
+  tournaments=[];
+
+  snap.forEach(item=>{
+    tournaments.push({
+      id:item.id,
+      ...item.data()
+    });
+  });
+
+  renderAll();
+
+}
+
+
+/* =========================
+   CREATE TOURNAMENT
+========================= */
+
+window.createTournament=async function(){
+
+  const name=document.getElementById("tournamentName").value.trim();
+  const format=document.getElementById("tournamentFormat").value;
+  const overs=Number(document.getElementById("tournamentOvers").value);
+
+  if(!name){
+    msg("tournamentMsg","Enter tournament name.","error");
+    return;
+  }
+
+  const tournamentId=id();
+
+  const tournament={
+    id:tournamentId,
+    ownerId:currentUser.uid,
+    ownerEmail:currentUser.email || "",
+    name:name,
+    format:format,
+    overs:overs || 10,
+    published:false,
+    createdAt:Date.now(),
+    teams:[],
+    matches:[]
+  };
+
+  try{
+
+    await setDoc(
+      doc(db,"tournaments",tournamentId),
+      tournament
+    );
+
+    document.getElementById("tournamentName").value="";
+
+    msg(
+      "tournamentMsg",
+      "Tournament created successfully!"
+    );
+
+    await loadTournaments();
+
+  }catch(error){
+
+    msg("tournamentMsg",error.message,"error");
+
+  }
+
+};
+
+
+/* =========================
+   DELETE TOURNAMENT
+========================= */
+
+window.deleteTournament=async function(tournamentId){
+
+  if(!confirm("Delete this tournament?"))return;
+
+  await deleteDoc(
+    doc(db,"tournaments",tournamentId)
+  );
+
+  await loadTournaments();
+
+};
+
+
+/* =========================
+   PUBLISH TOURNAMENT
+========================= */
+
+window.togglePublish=async function(tournamentId){
+
+  const t=tournaments.find(x=>x.id===tournamentId);
+
+  if(!t)return;
+
+  await updateDoc(
+    doc(db,"tournaments",tournamentId),
+    {
+      published:!t.published
+    }
+  );
+
+  await loadTournaments();
+
+};
+
+
+/* =========================
+   PUBLIC LINK
+========================= */
+
+window.copyPublicLink=function(tournamentId){
+
+  const url=
+    location.origin+
+    location.pathname+
+    "?t="+encodeURIComponent(tournamentId);
+
+  navigator.clipboard.writeText(url)
+    .then(()=>{
+      alert("Public tournament link copied!");
+    })
+    .catch(()=>{
+      prompt("Copy this link:",url);
+    });
+
+};
+
+
+window.openPublic=function(tournamentId){
+
+  const url=
+    location.origin+
+    location.pathname+
+    "?t="+encodeURIComponent(tournamentId);
+
+  window.open(url,"_blank");
+
+};
+
+
+/* =========================
+   ADD TEAM
+========================= */
+
+window.addTeam=async function(){
+
+  const tournamentId=
+    document.getElementById("teamTournament").value;
+
+  const name=
+    document.getElementById("teamName").value.trim();
+
+  if(!tournamentId){
+
+    msg(
+      "teamMsg",
+      "Please choose a tournament first.",
+      "error"
+    );
+
+    return;
+  }
+
+  if(!name){
+
+    msg(
+      "teamMsg",
+      "Enter team name.",
+      "error"
+    );
+
+    return;
+  }
+
+  const t=tournaments.find(
+    x=>x.id===tournamentId
+  );
+
+  if(!t)return;
+
+  const teams=[...(t.teams || [])];
+
+  if(
+    teams.some(
+      x=>x.name.toLowerCase()===name.toLowerCase()
+    )
+  ){
+
+    msg(
+      "teamMsg",
+      "This team already exists in this tournament.",
+      "error"
+    );
+
+    return;
+  }
+
+  teams.push({
+    id:id(),
+    name:name
+  });
+
+  try{
+
+    await updateDoc(
+      doc(db,"tournaments",tournamentId),
+      {teams:teams}
+    );
+
+    document.getElementById("teamName").value="";
+
+    msg(
+      "teamMsg",
+      "Team added successfully!"
+    );
+
+    await loadTournaments();
+
+  }catch(error){
+
+    msg("teamMsg",error.message,"error");
+
+  }
+
+};
+
+
+/* =========================
+   DELETE TEAM
+========================= */
+
+window.deleteTeam=async function(
+  tournamentId,
+  teamId
+){
+
+  const t=tournaments.find(
+    x=>x.id===tournamentId
+  );
+
+  if(!t)return;
+
+  const teams=(t.teams || [])
+    .filter(x=>x.id!==teamId);
+
+  await updateDoc(
+    doc(db,"tournaments",tournamentId),
+    {teams:teams}
+  );
+
+  await loadTournaments();
+
+};
+
+
+/* =========================
+   ADD MATCH
+========================= */
+
+window.addMatch=async function(){
+
+  const tournamentId=
+    document.getElementById("matchTournament").value;
+
+  const a=
+    document.getElementById("matchTeamA").value;
+
+  const b=
+    document.getElementById("matchTeamB").value;
+
+  const ra=
+    Number(document.getElementById("runsA").value);
+
+  const rb=
+    Number(document.getElementById("runsB").value);
+
+  const wa=
+    Number(document.getElementById("wicketsA").value);
+
+  const wb=
+    Number(document.getElementById("wicketsB").value);
+
+  const oa=
+    Number(document.getElementById("oversA").value);
+
+  const ob=
+    Number(document.getElementById("oversB").value);
+
+  const type=
+    document.getElementById("matchResult").value;
+
+  if(!tournamentId){
+    msg("matchMsg","Choose tournament.","error");
+    return;
+  }
+
+  if(!a || !b){
+    msg("matchMsg","Choose both teams.","error");
+    return;
+  }
+
+  if(a===b){
+    msg("matchMsg","Team A and Team B must be different.","error");
+    return;
+  }
+
+  const t=tournaments.find(
+    x=>x.id===tournamentId
+  );
+
+  if(!t)return;
+
+  const matches=[...(t.matches || [])];
+
+  matches.push({
+    id:id(),
+    a:a,
+    b:b,
+    ra:ra || 0,
+    rb:rb || 0,
+    wa:wa || 0,
+    wb:wb || 0,
+    oa:oa || 0,
+    ob:ob || 0,
+    type:type,
+    createdAt:Date.now()
+  });
+
+  await updateDoc(
+    doc(db,"tournaments",tournamentId),
+    {matches:matches}
+  );
+
+  document.getElementById("runsA").value="";
+  document.getElementById("runsB").value="";
+  document.getElementById("wicketsA").value="";
+  document.getElementById("wicketsB").value="";
+  document.getElementById("oversA").value="";
+  document.getElementById("oversB").value="";
+
+  msg("matchMsg","Match saved successfully!");
+
+  await loadTournaments();
+
+};
+
+
+/* =========================
+   DELETE MATCH
+========================= */
+
+window.deleteMatch=async function(
+  tournamentId,
+  matchId
+){
+
+  const t=tournaments.find(
+    x=>x.id===tournamentId
+  );
+
+  if(!t)return;
+
+  const matches=(t.matches || [])
+    .filter(x=>x.id!==matchId);
+
+  await updateDoc(
+    doc(db,"tournaments",tournamentId),
+    {matches:matches}
+  );
+
+  await loadTournaments();
+
+};
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+window.showSection=function(section){
+
+  document.querySelectorAll(".section")
+    .forEach(x=>x.classList.add("hidden"));
+
+  const target=document.getElementById(section);
+
+  if(target)
+    target.classList.remove("hidden");
+
+  document.querySelectorAll("nav button")
+    .forEach(x=>x.classList.remove("active"));
+
+  const nav=document.getElementById(
+    "nav"+section.charAt(0).toUpperCase()+section.slice(1)
+  );
+
+  if(nav)nav.classList.add("active");
+
+  renderAll();
+
+};
+
+
+/* =========================
+   TOURNAMENT DROPDOWNS
+   IMPORTANT FIX
+========================= */
+
+function populateTournamentDropdowns(){
+
+  const ids=[
+    "teamTournament",
+    "matchTournament",
+    "pointsTournament"
+  ];
+
+  ids.forEach(dropdownId=>{
+
+    const select=
+      document.getElementById(dropdownId);
+
+    if(!select)return;
+
+    const oldValue=select.value;
+
+    select.innerHTML=
+      '<option value="">Choose Tournament</option>';
+
+    tournaments.forEach(t=>{
+
+      const option=document.createElement("option");
+
+      option.value=t.id;
+      option.textContent=
+        t.name+
+        (t.published ? " ✓" : "");
+
+      select.appendChild(option);
+
+    });
+
+    if(
+      oldValue &&
+      tournaments.some(x=>x.id===oldValue)
+    ){
+      select.value=oldValue;
+    }
+
+  });
+
+}
+
+
+/* =========================
+   MATCH TEAMS
+========================= */
+
+window.loadMatchTeams=function(){
+
+  const tournamentId=
+    document.getElementById("matchTournament").value;
+
+  const a=document.getElementById("matchTeamA");
+  const b=document.getElementById("matchTeamB");
+
+  a.innerHTML='<option value="">Choose Team A</option>';
+  b.innerHTML='<option value="">Choose Team B</option>';
+
+  const t=tournaments.find(
+    x=>x.id===tournamentId
+  );
+
+  if(!t)return;
+
+  (t.teams || []).forEach(team=>{
+
+    const oa=document.createElement("option");
+    oa.value=team.id;
+    oa.textContent=team.name;
+
+    const ob=document.createElement("option");
+    ob.value=team.id;
+    ob.textContent=team.name;
+
+    a.appendChild(oa);
+    b.appendChild(ob);
+
+  });
+
+};
+
+
+/* =========================
+   POINTS TABLE CALCULATION
+========================= */
+
+function calculatePoints(t){
+
+  const stats={};
+
+  (t.teams || []).forEach(team=>{
+
+    stats[team.id]={
+      id:team.id,
+      name:team.name,
+      p:0,
+      w:0,
+      l:0,
+      tie:0,
+      nr:0,
+      pts:0,
+      rf:0,
+      of:0,
+      ra:0,
+      oa:0
+    };
+
+  });
+
+  (t.matches || []).forEach(m=>{
+
+    if(
+      !stats[m.a] ||
+      !stats[m.b]
+    )return;
+
+    const A=stats[m.a];
+    const B=stats[m.b];
+
+    A.p++;
+    B.p++;
+
+    A.rf+=Number(m.ra||0);
+    A.of+=Number(m.oa||0);
+
+    A.ra+=Number(m.rb||0);
+    A.oa+=Number(m.ob||0);
+
+    B.rf+=Number(m.rb||0);
+    B.of+=Number(m.ob||0);
+
+    B.ra+=Number(m.ra||0);
+    B.oa+=Number(m.oa||0);
+
+    if(m.type==="noresult"){
+
+      A.nr++;
+      B.nr++;
+
+      A.pts++;
+      B.pts++;
+
+      return;
+    }
+
+    if(m.type==="tie"){
+
+      A.tie++;
+      B.tie++;
+
+      A.pts++;
+      B.pts++;
+
+      return;
+    }
+
+    if(Number(m.ra||0)>Number(m.rb||0)){
+
+      A.w++;
+      B.l++;
+
+      A.pts+=2;
+
+    }else if(Number(m.rb||0)>Number(m.ra||0)){
+
+      B.w++;
+      A.l++;
+
+      B.pts+=2;
+
+    }else{
+
+      A.tie++;
+      B.tie++;
+
+      A.pts++;
+      B.pts++;
+
+    }
+
+  });
+
+  return Object.values(stats)
+    .map(x=>{
+
+      const forRate=
+        x.of>0 ? x.rf/x.of : 0;
+
+      const againstRate=
+        x.oa>0 ? x.ra/x.oa : 0;
+
+      x.nrr=forRate-againstRate;
+
+      return x;
+
+    })
+    .sort((a,b)=>{
+
+      if(b.pts!==a.pts)
+        return b.pts-a.pts;
+
+      return b.nrr-a.nrr;
+
+    });
+
+}
+
+
+/* =========================
+   RENDER POINTS
+========================= */
+
+window.renderPoints=function(){
+
+  const tournamentId=
+    document.getElementById("pointsTournament").value;
+
+  const body=
+    document.getElementById("pointsBody");
+
+  body.innerHTML="";
+
+  const t=tournaments.find(
+    x=>x.id===tournamentId
+  );
+
+  if(!t)return;
+
+  const rows=calculatePoints(t);
+
+  rows.forEach(x=>{
+
+    const tr=document.createElement("tr");
+
+    tr.innerHTML=`
+      <td>${esc(x.name)}</td>
+      <td>${x.p}</td>
+      <td>${x.w}</td>
+      <td>${x.l}</td>
+      <td>${x.tie}</td>
+      <td>${x.nr}</td>
+      <td><strong>${x.pts}</strong></td>
+      <td>${x.nrr.toFixed(2)}</td>
+    `;
+
+    body.appendChild(tr);
+
+  });
+
+};
+
+
+/* =========================
+   RENDER ALL
+========================= */
+
+function renderAll(){
+
+  populateTournamentDropdowns();
+
+  renderTournaments();
+  renderTeams();
+  renderMatches();
+  renderDashboard();
+
+  const matchTournament=
+    document.getElementById("matchTournament");
+
+  if(matchTournament &&
+     matchTournament.value){
+
+    loadMatchTeams();
+
+  }
+
+  const pointsTournament=
+    document.getElementById("pointsTournament");
+
+  if(pointsTournament &&
+     pointsTournament.value){
+
+    renderPoints();
+
+  }
+
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function renderDashboard(){
+
+  let teams=0;
+  let matches=0;
+
+  tournaments.forEach(t=>{
+
+    teams+=(t.teams || []).length;
+    matches+=(t.matches || []).length;
+
+  });
+
+  document.getElementById(
+    "dashTournaments"
+  ).textContent=tournaments.length;
+
+  document.getElementById(
+    "dashTeams"
+  ).textContent=teams;
+
+  document.getElementById(
+    "dashMatches"
+  ).textContent=matches;
+
+}
+
+
+/* =========================
+   RENDER TOURNAMENTS
+========================= */
+
+function renderTournaments(){
+
+  const box=
+    document.getElementById("tournamentList");
+
+  box.innerHTML="";
+
+  if(tournaments.length===0){
+
+    box.innerHTML=
+      '<p class="muted">No tournaments yet.</p>';
+
+    return;
+  }
+
+  tournaments.forEach(t=>{
+
+    const div=document.createElement("div");
+
+    div.className="tournament-row";
+
+    div.innerHTML=`
+
+      <h3>${esc(t.name)}</h3>
+
+      <p class="muted">
+        ${esc(t.format)} • ${t.overs} overs
+      </p>
+
+      <p>
+        <span class="badge">
+          ${t.published ? "PUBLIC" : "PRIVATE"}
+        </span>
+      </p>
+
+      <button
+        class="${t.published ? "gray" : ""}"
+        onclick="togglePublish('${t.id}')">
+        ${t.published ? "Unpublish" : "Publish"}
+      </button>
+
+      ${
+        t.published
+        ? `
+          <button
+            class="secondary"
+            onclick="copyPublicLink('${t.id}')">
+            Copy Public Link
+          </button>
+
+          <button
+            class="secondary"
+            onclick="openPublic('${t.id}')">
+            Open Public
+          </button>
+        `
+        : ""
+      }
+
+      <button
+        class="danger"
+        onclick="deleteTournament('${t.id}')">
+        Delete
+      </button>
+    `;
+
+    box.appendChild(div);
+
+  });
+
+}
+
+
+/* =========================
+   RENDER TEAMS
+========================= */
+
+function renderTeams(){
+
+  const box=
+    document.getElementById("teamList");
+
+  box.innerHTML="";
+
+  tournaments.forEach(t=>{
+
+    if(!(t.teams || []).length)return;
+
+    const title=document.createElement("h3");
+
+    title.textContent=t.name;
+
+    box.appendChild(title);
+
+    t.teams.forEach(team=>{
+
+      const div=document.createElement("div");
+
+      div.className="team-row";
+
+      div.innerHTML=`
+        <strong>${esc(team.name)}</strong>
+
+        <button
+          class="danger small"
+          style="float:right"
+          onclick="deleteTeam('${t.id}','${team.id}')">
+          Delete
+        </button>
+      `;
+
+      box.appendChild(div);
+
+    });
+
+  });
+
+}
+
+
+/* =========================
+   RENDER MATCHES
+========================= */
+
+function renderMatches(){
+
+  const box=
+    document.getElementById("matchList");
+
+  box.innerHTML="";
+
+  tournaments.forEach(t=>{
+
+    (t.matches || []).forEach(m=>{
+
+      const teamA=
+        (t.teams || []).find(x=>x.id===m.a);
+
+      const teamB=
+        (t.teams || []).find(x=>x.id===m.b);
+
+      const div=document.createElement("div");
+
+      div.className="match-row";
+
+      div.innerHTML=`
+
+        <strong>${esc(t.name)}</strong>
+
+        <p>
+          ${esc(teamA?.name || "Team A")}
+          <strong>${m.ra}</strong>
+          -
+          <strong>${m.rb}</strong>
+          ${esc(teamB?.name || "Team B")}
+        </p>
+
+        <p class="muted">
+          Overs: ${m.oa} - ${m.ob}
+        </p>
+
+        <button
+          class="danger small"
+          onclick="deleteMatch('${t.id}','${m.id}')">
+          Delete
+        </button>
+      `;
+
+      box.appendChild(div);
+
+    });
+
+  });
+
+}
+
+
+/* =========================
+   PUBLIC TOURNAMENT
+========================= */
+
+async function loadPublicTournament(){
+
+  const params=
+    new URLSearchParams(location.search);
+
+  const tournamentId=params.get("t");
+
+  if(!tournamentId)return;
+
+  try{
+
+    const snap=await getDoc(
+      doc(db,"tournaments",tournamentId)
+    );
+
+    if(!snap.exists()){
+
+      showPublicError("Tournament not found.");
+      return;
+
+    }
+
+    const t={
+      id:snap.id,
+      ...snap.data()
+    };
+
+    if(t.published!==true){
+
+      showPublicError(
+        "This tournament is not public."
+      );
+
+      return;
+
+    }
+
+    publicTournament=t;
+
+    document.getElementById(
+      "authScreen"
+    ).classList.add("hidden");
+
+    document.getElementById(
+      "appScreen"
+    ).classList.add("hidden");
+
+    document.getElementById(
+      "publicScreen"
+    ).classList.remove("hidden");
+
+    renderPublic(t);
+
+  }catch(error){
+
+    showPublicError(error.message);
+
+  }
+
+}
+
+
+function showPublicError(text){
+
+  document.getElementById(
+    "authScreen"
+  ).classList.add("hidden");
+
+  document.getElementById(
+    "appScreen"
+  ).classList.add("hidden");
+
+  document.getElementById(
+    "publicScreen"
+  ).classList.remove("hidden");
+
+  document.getElementById(
+    "publicTitle"
+  ).textContent="RC24 Tournament";
+
+  document.getElementById(
+    "publicInfo"
+  ).textContent=text;
+
+}
+
+
+/* =========================
+   RENDER PUBLIC
+========================= */
+
+function renderPublic(t){
+
+  document.getElementById(
+    "publicTitle"
+  ).textContent=t.name;
+
+  document.getElementById(
+    "publicInfo"
+  ).textContent=
+    `${t.format} • ${t.overs} overs`;
+
+  const teamsBox=
+    document.getElementById("publicTeams");
+
+  teamsBox.innerHTML="";
+
+  (t.teams || []).forEach(team=>{
+
+    const div=document.createElement("div");
+
+    div.className="team-row";
+
+    div.textContent=team.name;
+
+    teamsBox.appendChild(div);
+
+  });
+
+
+  const matchesBox=
+    document.getElementById("publicMatches");
+
+  matchesBox.innerHTML="";
+
+  (t.matches || []).forEach(m=>{
+
+    const A=
+      (t.teams || []).find(x=>x.id===m.a);
+
+    const B=
+      (t.teams || []).find(x=>x.id===m.b);
+
+    const div=document.createElement("div");
+
+    div.className="match-row";
+
+    div.innerHTML=`
+      <strong>
+        ${esc(A?.name || "Team A")}
+        ${m.ra}
+        -
+        ${m.rb}
+        ${esc(B?.name || "Team B")}
+      </strong>
+
+      <p class="muted">
+        Overs: ${m.oa} - ${m.ob}
+      </p>
+    `;
+
+    matchesBox.appendChild(div);
+
+  });
+
+
+  const body=
+    document.getElementById("publicPointsBody");
+
+  body.innerHTML="";
+
+  calculatePoints(t).forEach(x=>{
+
+    const tr=document.createElement("tr");
+
+    tr.innerHTML=`
+      <td>${esc(x.name)}</td>
+      <td>${x.p}</td>
+      <td>${x.w}</td>
+      <td>${x.l}</td>
+      <td>${x.tie}</td>
+      <td>${x.nr}</td>
+      <td><strong>${x.pts}</strong></td>
+      <td>${x.nrr.toFixed(2)}</td>
+    `;
+
+    body.appendChild(tr);
+
+  });
+
+}
+
+
+/* =========================
+   CREATE YOUR OWN
+========================= */
+
+window.createOwnTournament=function(){
+
+  location.href=
+    location.origin+
+    location.pathname;
+
+};
+
+
+/* =========================
+   START
+========================= */
+
+if(
+  new URLSearchParams(location.search).has("t")
+){
+
+  loadPublicTournament();
+
+}
+
+</script>
+
+</body>
+</html>
