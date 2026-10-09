@@ -209,11 +209,113 @@ hr{
   border:0;
   border-top:1px solid #243b53;
   margin:18px 0;
+}/* REHAN'S TECHNOLOGY INTRO */
+#rehan-intro {
+position: fixed;
+inset: 0;
+z-index: 100000;
+display: grid;
+place-items: center;
+background: radial-gradient(circle, #10364b, #061321 55%, #01040a);
+color: #e9fbff;
+transition: opacity .8s ease, visibility .8s ease;
+}
+
+#rehan-intro.rehan-hide {
+opacity: 0;
+visibility: hidden;
+pointer-events: none;
+}
+
+.rehan-energy {
+position: absolute;
+width: 210px;
+height: 210px;
+border: 2px solid #47e8ff88;
+border-radius: 50%;
+box-shadow: 0 0 35px #00d9ff55, inset 0 0 35px #00d9ff33;
+animation: rehan-orbit 3s linear infinite;
+}
+
+.rehan-brand {
+position: relative;
+z-index: 1;
+padding: 20px;
+text-align: center;
+animation: rehan-materialize 1.5s ease both;
+}
+
+.rehan-brand small {
+display: block;
+margin-bottom: 16px;
+color: #67e8f9;
+font-size: 10px;
+letter-spacing: .3em;
+}
+
+.rehan-brand h1 {
+margin: 0;
+font-size: clamp(28px, 8vw, 48px);
+font-weight: 900;
+overflow-wrap: anywhere;
+text-shadow: 0 0 12px #00d9ff, 0 0 35px #008cff;
+}
+
+.rehan-brand p {
+margin-top: 16px;
+color: #a4c8dc;
+font-size: 11px;
+letter-spacing: .12em;
+}
+
+.rehan-skip {
+position: absolute;
+right: 18px;
+bottom: 24px;
+padding: 12px 16px;
+border: 1px solid #67e8f9;
+background: #092238;
+color: white;
+}
+
+@keyframes rehan-orbit {
+from { transform: rotate(0deg) scale(.75); }
+50% { transform: rotate(180deg) scale(1); }
+to { transform: rotate(360deg) scale(.75); }
+}
+
+@keyframes rehan-materialize {
+from {
+opacity: 0;
+transform: translateY(24px) scale(.85);
+filter: blur(10px);
+}
+to {
+opacity: 1;
+transform: translateY(0) scale(1);
+filter: blur(0);
+}
 }
 </style>
 </head>
 
 <body>
+
+<!-- REHAN'S TECHNOLOGY INTRO -->
+<div id="rehan-intro">
+  <div class="rehan-energy"></div>
+
+  <div class="rehan-brand">
+    <small>INITIALIZING EXPERIENCE</small>
+    <h1>REHAN'S TECHNOLOGY</h1>
+    <p>CREATIVITY · TECHNOLOGY · INNOVATION</p>
+  </div>
+
+  <button id="rehan-skip" class="rehan-skip" type="button">
+    Skip Intro →
+  </button>
+</div>
+<!-- END REHAN'S TECHNOLOGY INTRO -->
 
 <header>
   <h1>🏏 RC24 TOURNAMENTS</h1>
@@ -1859,6 +1961,31 @@ if(
 
 }
 
+</script>
+
+<script>
+(function () {
+  const intro = document.getElementById("rehan-intro");
+  const skip = document.getElementById("rehan-skip");
+
+  if (!intro || !skip) return;
+
+  let closed = false;
+
+  function closeIntro() {
+    if (closed) return;
+    closed = true;
+
+    intro.classList.add("rehan-hide");
+
+    window.setTimeout(function () {
+      intro.remove();
+    }, 850);
+  }
+
+  skip.addEventListener("click", closeIntro);
+  window.setTimeout(closeIntro, 3500);
+})();
 </script>
 
 </body>
