@@ -1218,125 +1218,140 @@ window.loadMatchTeams=function(){
    POINTS TABLE CALCULATION
 ========================= */
 
-function calculatePoints(t){
 
-  const stats={};
+/* =========================
+   POINTS TABLE CALCULATION
+   FIXED NRR CALCULATION
+========================= */
 
-  (t.teams || []).forEach(team=>{
+// Convert cricket overs into actual balls.
+// Example: 9.3 overs = 57 balls, not 9.3 overs.
+function oversToBalls(overs) {
+  const value = Number(overs) || 0;
 
-    stats[team.id]={
-      id:team.id,
-      name:team.name,
-      p:0,
-      w:0,
-      l:0,
-      tie:0,
-      nr:0,
-      pts:0,
-      rf:0,
-      of:0,
-      ra:0,
-      oa:0
+  const wholeOvers = Math.floor(value);
+  const balls = Math.round((value - wholeOvers) * 10);
+
+  if (balls < 0 || balls > 5) {
+    return wholeOvers * 6;
+  }
+
+  return wholeOvers * 6 + balls;
+}
+
+function calculatePoints(t) {
+  const stats = {};
+
+  (t.teams || []).forEach(team => {
+    stats[team.id] = {
+      id: team.id,
+      name: team.name,
+      p: 0,
+      w: 0,
+      l: 0,
+      tie: 0,
+      nr: 0,
+      pts: 0,
+      rf: 0,
+      ballsFaced: 0,
+      ra: 0,
+      ballsBowled: 0,
+      nrr: 0
     };
-
   });
 
-  (t.matches || []).forEach(m=>{
+  (t.matches || []).forEach(m => {
+    if (!stats[m.a] || !stats[m.b]) return;
 
-    if(
-      !stats[m.a] ||
-      !stats[m.b]
-    )return;
+    const A = stats[m.a];
+    const B = stats[m.b];
 
-    const A=stats[m.a];
-    const B=stats[m.b];
+    const runsA = Number(m.ra) || 0;
+    const runsB = Number(m.rb) || 0;
+    const wicketsA = Number(m.wa) || 0;
+    const wicketsB = Number(m.wb) || 0;
+
+    const quotaBalls = oversToBalls(t.overs);
+
+    // All-out innings count as having used the
+    // full allotted overs for NRR purposes.
+    const ballsA = wicketsA >= 10
+      ? quotaBalls
+      : oversToBalls(m.oa);
+
+    const ballsB = wicketsB >= 10
+      ? quotaBalls
+      : oversToBalls(m.ob);
 
     A.p++;
     B.p++;
 
-    A.rf+=Number(m.ra||0);
-    A.of+=Number(m.oa||0);
-
-    A.ra+=Number(m.rb||0);
-    A.oa+=Number(m.ob||0);
-
-    B.rf+=Number(m.rb||0);
-    B.of+=Number(m.ob||0);
-
-    B.ra+=Number(m.ra||0);
-    B.oa+=Number(m.oa||0);
-
-    if(m.type==="noresult"){
-
+    // No-result matches award points but do not
+    // contribute runs or overs to NRR.
+    if (m.type === "noresult") {
       A.nr++;
       B.nr++;
-
       A.pts++;
       B.pts++;
-
       return;
     }
 
-    if(m.type==="tie"){
+    // Include runs and balls for completed matches.
+    A.rf += runsA;
+    A.ballsFaced += ballsA;
+    A.ra += runsB;
+    A.ballsBowled += ballsB;
 
+    B.rf += runsB;
+    B.ballsFaced += ballsB;
+    B.ra += runsA;
+    B.ballsBowled += ballsA;
+
+    if (m.type === "tie") {
       A.tie++;
       B.tie++;
-
       A.pts++;
       B.pts++;
-
       return;
     }
 
-    if(Number(m.ra||0)>Number(m.rb||0)){
-
+    if (runsA > runsB) {
       A.w++;
       B.l++;
-
-      A.pts+=2;
-
-    }else if(Number(m.rb||0)>Number(m.ra||0)){
-
+      A.pts += 2;
+    } else if (runsB > runsA) {
       B.w++;
       A.l++;
-
-      B.pts+=2;
-
-    }else{
-
+      B.pts += 2;
+    } else {
       A.tie++;
       B.tie++;
-
       A.pts++;
       B.pts++;
-
     }
-
   });
 
   return Object.values(stats)
-    .map(x=>{
+    .map(team => {
+      const runRateFor = team.ballsFaced > 0
+        ? (team.rf * 6) / team.ballsFaced
+        : 0;
 
-      const forRate=
-        x.of>0 ? x.rf/x.of : 0;
+      const runRateAgainst = team.ballsBowled > 0
+        ? (team.ra * 6) / team.ballsBowled
+        : 0;
 
-      const againstRate=
-        x.oa>0 ? x.ra/x.oa : 0;
+      team.nrr = runRateFor - runRateAgainst;
 
-      x.nrr=forRate-againstRate;
-
-      return x;
-
+      return team;
     })
-    .sort((a,b)=>{
+    .sort((a, b) => {
+      if (b.pts !== a.pts) {
+        return b.pts - a.pts;
+      }
 
-      if(b.pts!==a.pts)
-        return b.pts-a.pts;
-
-      return b.nrr-a.nrr;
-
+      return b.nrr - a.nrr;
     });
-
 }
 
 
