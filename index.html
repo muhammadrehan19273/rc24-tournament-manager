@@ -7,315 +7,74 @@
 
 <style>
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:#07111f;
-  color:#fff;
-}
-
-header{
-  background:#0b1b2e;
-  padding:18px;
-  text-align:center;
-  border-bottom:2px solid #16a34a;
-}
-
-header h1{
-  margin:0;
-  color:#22c55e;
-  font-size:24px;
-}
-
-header p{
-  margin:6px 0 0;
-  color:#9ca3af;
-  font-size:13px;
-}
-
-nav{
-  display:flex;
-  gap:6px;
-  overflow-x:auto;
-  padding:10px;
-  background:#0a1626;
-}
-
-nav button{
-  flex:0 0 auto;
-  background:#12243a;
-  color:#fff;
-  border:1px solid #23415f;
-  padding:10px 14px;
-  border-radius:8px;
-}
-
-nav button.active{
-  background:#16a34a;
-  border-color:#16a34a;
-}
-
-.container{
-  max-width:1000px;
-  margin:auto;
-  padding:16px;
-}
-
-.card{
-  background:#0d1d31;
-  border:1px solid #203b57;
-  border-radius:12px;
-  padding:16px;
-  margin-bottom:16px;
-}
-
-h2,h3{
-  margin-top:0;
-}
-
-input,select{
-  width:100%;
-  padding:12px;
-  margin:7px 0;
-  border-radius:8px;
-  border:1px solid #31516e;
-  background:#081525;
-  color:#fff;
-  font-size:15px;
-}
-
-button{
-  cursor:pointer;
-  border:0;
-  border-radius:8px;
-  padding:11px 15px;
-  background:#16a34a;
-  color:white;
-  font-weight:bold;
-}
-
-button.secondary{
-  background:#2563eb;
-}
-
-button.danger{
-  background:#dc2626;
-}
-
-button.gray{
-  background:#475569;
-}
-
-button.small{
-  padding:7px 10px;
-  font-size:12px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:12px;
-}
-
-.stat{
-  background:#12243a;
-  padding:18px;
-  border-radius:10px;
-  text-align:center;
-}
-
-.stat strong{
-  display:block;
-  font-size:25px;
-  color:#22c55e;
-}
-
-.hidden{
-  display:none!important;
-}
-
-.muted{
-  color:#94a3b8;
-}
-
-.success{
-  color:#4ade80;
-}
-
-.error{
-  color:#f87171;
-}
-
-.warning{
-  color:#facc15;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:12px;
-  min-width:600px;
-}
-
-th,td{
-  padding:10px;
-  border-bottom:1px solid #263d54;
-  text-align:center;
-}
-
-th{
-  background:#12243a;
-  color:#22c55e;
-}
-
-.table-wrap{
-  overflow-x:auto;
-}
-
-.team-row,.tournament-row,.match-row{
-  background:#12243a;
-  padding:12px;
-  border-radius:9px;
-  margin:8px 0;
-}
-
-.badge{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:20px;
-  background:#14532d;
-  color:#86efac;
-  font-size:11px;
-}
-
-.auth-box{
-  max-width:450px;
-  margin:40px auto;
-}
-
-.public-header{
-  text-align:center;
-  padding:25px 10px;
-}
-
-.logo{
-  font-size:30px;
-  font-weight:bold;
-  color:#22c55e;
-}
-
-hr{
-  border:0;
-  border-top:1px solid #243b53;
-  margin:18px 0;
-}/* REHAN'S TECHNOLOGY INTRO */
-#rehan-intro {
-position: fixed;
-inset: 0;
-z-index: 100000;
-display: grid;
-place-items: center;
-background: radial-gradient(circle, #10364b, #061321 55%, #01040a);
-color: #e9fbff;
-transition: opacity .8s ease, visibility .8s ease;
-}
-
-#rehan-intro.rehan-hide {
-opacity: 0;
-visibility: hidden;
-pointer-events: none;
-}
-
-.rehan-energy {
-position: absolute;
-width: 210px;
-height: 210px;
-border: 2px solid #47e8ff88;
-border-radius: 50%;
-box-shadow: 0 0 35px #00d9ff55, inset 0 0 35px #00d9ff33;
-animation: rehan-orbit 3s linear infinite;
-}
-
-.rehan-brand {
-position: relative;
-z-index: 1;
-padding: 20px;
-text-align: center;
-animation: rehan-materialize 1.5s ease both;
-}
-
-.rehan-brand small {
-display: block;
-margin-bottom: 16px;
-color: #67e8f9;
-font-size: 10px;
-letter-spacing: .3em;
-}
-
-.rehan-brand h1 {
-margin: 0;
-font-size: clamp(28px, 8vw, 48px);
-font-weight: 900;
-overflow-wrap: anywhere;
-text-shadow: 0 0 12px #00d9ff, 0 0 35px #008cff;
-}
-
-.rehan-brand p {
-margin-top: 16px;
-color: #a4c8dc;
-font-size: 11px;
-letter-spacing: .12em;
-}
-
-.rehan-skip {
-position: absolute;
-right: 18px;
-bottom: 24px;
-padding: 12px 16px;
-border: 1px solid #67e8f9;
-background: #092238;
-color: white;
-}
-
-@keyframes rehan-orbit {
-from { transform: rotate(0deg) scale(.75); }
-50% { transform: rotate(180deg) scale(1); }
-to { transform: rotate(360deg) scale(.75); }
-}
-
-@keyframes rehan-materialize {
-from {
-opacity: 0;
-transform: translateY(24px) scale(.85);
-filter: blur(10px);
-}
-to {
-opacity: 1;
-transform: translateY(0) scale(1);
-filter: blur(0);
-}
-}
+body{margin:0;font-family:Arial,sans-serif;background:#07111f;color:#fff}
+#hackerBg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+header,nav,#authScreen,#appScreen,#publicScreen{position:relative;z-index:1}
+header{background:rgba(11,27,46,.85);padding:18px;text-align:center;border-bottom:2px solid #16a34a;box-shadow:0 0 20px #16a34a66}
+header h1{margin:0;color:#22c55e;font-size:24px;text-shadow:0 0 12px #22c55e;font-family:"Courier New",monospace;letter-spacing:2px}
+header p{margin:6px 0 0;color:#9ca3af;font-size:13px}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px;background:rgba(10,22,38,.85)}
+nav button{flex:0 0 auto;background:#12243a;color:#fff;border:1px solid #23415f;padding:10px 14px;border-radius:8px}
+nav button.active{background:#16a34a;border-color:#16a34a;box-shadow:0 0 12px #22c55e}
+.container{max-width:1000px;margin:auto;padding:16px}
+.card{background:rgba(13,29,49,.82);border:1px solid #203b57;border-radius:12px;padding:16px;margin-bottom:16px;backdrop-filter:blur(3px);box-shadow:0 0 18px rgba(34,197,94,.08)}
+h2,h3{margin-top:0}
+input,select{width:100%;padding:12px;margin:7px 0;border-radius:8px;border:1px solid #31516e;background:#081525;color:#fff;font-size:15px}
+button{cursor:pointer;border:0;border-radius:8px;padding:11px 15px;background:#16a34a;color:white;font-weight:bold}
+button.secondary{background:#2563eb}
+button.danger{background:#dc2626}
+button.gray{background:#475569}
+button.small{padding:7px 10px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.stat{background:rgba(18,36,58,.85);padding:18px;border-radius:10px;text-align:center}
+.stat strong{display:block;font-size:25px;color:#22c55e}
+.hidden{display:none!important}
+.muted{color:#94a3b8}
+.success{color:#4ade80}
+.error{color:#f87171}
+.warning{color:#facc15}
+table{width:100%;border-collapse:collapse;margin-top:12px;min-width:600px}
+th,td{padding:10px;border-bottom:1px solid #263d54;text-align:center}
+th{background:#12243a;color:#22c55e}
+.table-wrap{overflow-x:auto}
+.team-row,.tournament-row,.match-row{background:rgba(18,36,58,.85);padding:12px;border-radius:9px;margin:8px 0}
+.fix-round{color:#22c55e;font-family:"Courier New",monospace;margin:16px 0 4px}
+.fix-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#14532d;color:#86efac;font-size:11px}
+.badge.done{background:#1e3a8a;color:#bfdbfe}
+.auth-box{max-width:450px;margin:40px auto}
+.public-header{text-align:center;padding:25px 10px}
+.logo{font-size:30px;font-weight:bold;color:#22c55e}
+hr{border:0;border-top:1px solid #243b53;margin:18px 0}
+/* REHAN'S TECHNOLOGY INTRO */
+#rehan-intro{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;background:radial-gradient(circle,#10364b,#061321 55%,#01040a);color:#e9fbff;transition:opacity .8s ease,visibility .8s ease}
+#rehan-intro.rehan-hide{opacity:0;visibility:hidden;pointer-events:none}
+.rehan-energy{position:absolute;width:210px;height:210px;border:2px solid #47e8ff88;border-radius:50%;box-shadow:0 0 35px #00d9ff55,inset 0 0 35px #00d9ff33;animation:rehan-orbit 3s linear infinite}
+.rehan-brand{position:relative;z-index:1;padding:20px;text-align:center;animation:rehan-materialize 1.5s ease both}
+.rehan-brand small{display:block;margin-bottom:16px;color:#67e8f9;font-size:10px;letter-spacing:.3em}
+.rehan-brand h1{margin:0;font-size:clamp(28px,8vw,48px);font-weight:900;overflow-wrap:anywhere;text-shadow:0 0 12px #00d9ff,0 0 35px #008cff}
+.rehan-brand p{margin-top:16px;color:#a4c8dc;font-size:11px;letter-spacing:.12em}
+.rehan-skip{position:absolute;right:18px;bottom:24px;padding:12px 16px;border:1px solid #67e8f9;background:#092238;color:white}
+@keyframes rehan-orbit{from{transform:rotate(0deg) scale(.75)}50%{transform:rotate(180deg) scale(1)}to{transform:rotate(360deg) scale(.75)}}
+@keyframes rehan-materialize{from{opacity:0;transform:translateY(24px) scale(.85);filter:blur(10px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
 </style>
 </head>
 
 <body>
 
+<!-- 3D HACKER BACKGROUND -->
+<canvas id="hackerBg"></canvas>
+
 <!-- REHAN'S TECHNOLOGY INTRO -->
 <div id="rehan-intro">
   <div class="rehan-energy"></div>
-
   <div class="rehan-brand">
     <small>INITIALIZING EXPERIENCE</small>
     <h1>REHAN'S TECHNOLOGY</h1>
     <p>CREATIVITY · TECHNOLOGY · INNOVATION</p>
   </div>
-
-  <button id="rehan-skip" class="rehan-skip" type="button">
-    Skip Intro →
-  </button>
+  <button id="rehan-skip" class="rehan-skip" type="button">Skip Intro →</button>
 </div>
-<!-- END REHAN'S TECHNOLOGY INTRO -->
 
 <header>
   <h1>🏏 RC24 TOURNAMENTS</h1>
@@ -329,28 +88,20 @@ filter: blur(0);
     <div id="loginBox">
       <h2>🔐 Organizer Login</h2>
       <p class="muted">Login to manage your tournaments.</p>
-
       <input id="loginEmail" type="email" placeholder="Email">
       <input id="loginPassword" type="password" placeholder="Password">
-
       <button onclick="login()">Login</button>
       <button class="gray" onclick="showRegister()">Create Admin Account</button>
-
       <p id="loginMsg"></p>
     </div>
 
     <div id="registerBox" class="hidden">
       <h2>📝 Create Account</h2>
-      <p class="muted">
-        Email can be your Gmail, but use a new RC24 password.
-      </p>
-
+      <p class="muted">Email can be your Gmail, but use a new RC24 password.</p>
       <input id="regEmail" type="email" placeholder="Email">
       <input id="regPassword" type="password" placeholder="New RC24 password">
-
       <button onclick="register()">Create Account</button>
       <button class="gray" onclick="showLogin()">Back to Login</button>
-
       <p id="registerMsg"></p>
     </div>
 
@@ -364,6 +115,7 @@ filter: blur(0);
   <button id="navDashboard" onclick="showSection('dashboard')">Dashboard</button>
   <button id="navTournaments" onclick="showSection('tournaments')">Tournaments</button>
   <button id="navTeams" onclick="showSection('teams')">Teams</button>
+  <button id="navFixtures" onclick="showSection('fixtures')">Fixtures</button>
   <button id="navMatches" onclick="showSection('matches')">Match Scoring</button>
   <button id="navPoints" onclick="showSection('points')">Points Table</button>
   <button onclick="logout()">Logout</button>
@@ -373,113 +125,94 @@ filter: blur(0);
 
 <!-- DASHBOARD -->
 <section id="dashboard" class="section">
-
   <div class="card">
     <h2>🏏 Welcome to RC24</h2>
     <p class="muted" id="userEmail"></p>
   </div>
-
   <div class="grid">
-    <div class="stat">
-      <strong id="dashTournaments">0</strong>
-      Tournaments
-    </div>
-
-    <div class="stat">
-      <strong id="dashTeams">0</strong>
-      Teams
-    </div>
-
-    <div class="stat">
-      <strong id="dashMatches">0</strong>
-      Matches
-    </div>
+    <div class="stat"><strong id="dashTournaments">0</strong>Tournaments</div>
+    <div class="stat"><strong id="dashTeams">0</strong>Teams</div>
+    <div class="stat"><strong id="dashMatches">0</strong>Matches</div>
   </div>
-
 </section>
 
 <!-- TOURNAMENTS -->
 <section id="tournaments" class="section hidden">
-
   <div class="card">
     <h2>🏆 Create Tournament</h2>
-
     <input id="tournamentName" placeholder="Tournament name">
-
     <select id="tournamentFormat">
       <option value="League">League</option>
       <option value="Knockout">Knockout</option>
       <option value="League + Knockout">League + Knockout</option>
     </select>
-
     <input id="tournamentOvers" type="number" min="1" value="10" placeholder="Overs">
-
     <button onclick="createTournament()">Create Tournament</button>
-
     <p id="tournamentMsg"></p>
   </div>
-
   <div class="card">
     <h2>My Tournaments</h2>
     <div id="tournamentList"></div>
   </div>
-
 </section>
 
 <!-- TEAMS -->
 <section id="teams" class="section hidden">
-
   <div class="card">
     <h2>👥 Add Team</h2>
-
     <label class="muted">Choose Tournament</label>
-
-    <!-- FIXED TOURNAMENT DROPDOWN -->
-    <select id="teamTournament">
-      <option value="">Choose Tournament</option>
-    </select>
-
+    <select id="teamTournament"><option value="">Choose Tournament</option></select>
     <input id="teamName" placeholder="Team name">
-
     <button onclick="addTeam()">Add Team</button>
-
     <p id="teamMsg"></p>
   </div>
-
   <div class="card">
     <h2>Teams</h2>
     <div id="teamList"></div>
   </div>
+</section>
 
+<!-- FIXTURES (NEW) -->
+<section id="fixtures" class="section hidden">
+  <div class="card">
+    <h2>📅 Auto Generate Fixtures</h2>
+    <label class="muted">Tournament</label>
+    <select id="fixtureTournament" onchange="renderFixtures()">
+      <option value="">Choose Tournament</option>
+    </select>
+    <label class="muted">Type (League ke liye)</label>
+    <select id="fixtureMode">
+      <option value="single">Single Round Robin (har team 1 baar)</option>
+      <option value="double">Double Round Robin (har team 2 baar)</option>
+    </select>
+    <button onclick="generateFixtures()">⚡ Generate Fixtures</button>
+    <button class="danger" onclick="clearFixtures()">Clear Fixtures</button>
+    <p class="muted">Knockout tournament me Round 1 random pairing banegi (odd team ko BYE milega).</p>
+    <p id="fixtureMsg"></p>
+  </div>
+  <div class="card">
+    <h2>Fixtures</h2>
+    <div id="fixtureList"></div>
+  </div>
 </section>
 
 <!-- MATCHES -->
 <section id="matches" class="section hidden">
-
   <div class="card">
     <h2>🏏 Match Scoring</h2>
-
     <label class="muted">Tournament</label>
     <select id="matchTournament" onchange="loadMatchTeams()">
       <option value="">Choose Tournament</option>
     </select>
-
     <label class="muted">Team A</label>
-    <select id="matchTeamA">
-      <option value="">Choose Team A</option>
-    </select>
-
+    <select id="matchTeamA"><option value="">Choose Team A</option></select>
     <label class="muted">Team B</label>
-    <select id="matchTeamB">
-      <option value="">Choose Team B</option>
-    </select>
+    <select id="matchTeamB"><option value="">Choose Team B</option></select>
 
     <input id="runsA" type="number" min="0" placeholder="Team A Runs">
     <input id="wicketsA" type="number" min="0" max="10" placeholder="Team A Wickets">
     <input id="oversA" type="number" min="0" step="0.1" placeholder="Team A Overs">
-
     <hr>
-
     <input id="runsB" type="number" min="0" placeholder="Team B Runs">
     <input id="wicketsB" type="number" min="0" max="10" placeholder="Team B Wickets">
     <input id="oversB" type="number" min="0" step="0.1" placeholder="Team B Overs">
@@ -489,48 +222,31 @@ filter: blur(0);
       <option value="tie">Tie</option>
       <option value="noresult">No Result</option>
     </select>
-
     <button onclick="addMatch()">Save Match</button>
-
     <p id="matchMsg"></p>
   </div>
-
   <div class="card">
     <h2>Matches</h2>
     <div id="matchList"></div>
   </div>
-
 </section>
 
 <!-- POINTS -->
 <section id="points" class="section hidden">
-
   <div class="card">
     <h2>📊 Points Table</h2>
-
     <select id="pointsTournament" onchange="renderPoints()">
       <option value="">Choose Tournament</option>
     </select>
-
     <div class="table-wrap">
       <table>
         <thead>
-          <tr>
-            <th>Team</th>
-            <th>P</th>
-            <th>W</th>
-            <th>L</th>
-            <th>T</th>
-            <th>NR</th>
-            <th>Pts</th>
-            <th>NRR</th>
-          </tr>
+          <tr><th>Team</th><th>P</th><th>W</th><th>L</th><th>T</th><th>NR</th><th>Pts</th><th>NRR</th></tr>
         </thead>
         <tbody id="pointsBody"></tbody>
       </table>
     </div>
   </div>
-
 </section>
 
 </div>
@@ -538,7 +254,6 @@ filter: blur(0);
 
 <!-- PUBLIC PAGE -->
 <div id="publicScreen" class="hidden">
-
   <div class="container">
 
     <div class="public-header">
@@ -553,26 +268,21 @@ filter: blur(0);
     </div>
 
     <div class="card">
+      <h2>📅 Fixtures</h2>
+      <div id="publicFixtures"></div>
+    </div>
+
+    <div class="card">
       <h2>🏏 Matches</h2>
       <div id="publicMatches"></div>
     </div>
 
     <div class="card">
       <h2>📊 Points Table</h2>
-
       <div class="table-wrap">
         <table>
           <thead>
-            <tr>
-              <th>Team</th>
-              <th>P</th>
-              <th>W</th>
-              <th>L</th>
-              <th>T</th>
-              <th>NR</th>
-              <th>Pts</th>
-              <th>NRR</th>
-            </tr>
+            <tr><th>Team</th><th>P</th><th>W</th><th>L</th><th>T</th><th>NR</th><th>Pts</th><th>NRR</th></tr>
           </thead>
           <tbody id="publicPointsBody"></tbody>
         </table>
@@ -580,48 +290,19 @@ filter: blur(0);
     </div>
 
     <div class="card" style="text-align:center">
-      <button onclick="createOwnTournament()">
-        🚀 Create Your Own Tournament
-      </button>
+      <button onclick="createOwnTournament()">🚀 Create Your Own Tournament</button>
     </div>
 
   </div>
-
 </div>
 
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  query,
-  where
-}
-from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-
-
-/* =========================
-   FIREBASE CONFIG
-========================= */
-
+/* FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyAip691d5wq_wnLaHaRf8KDEZKuBTdZJQ4",
   authDomain: "rc-24-tournaments-manager.firebaseapp.com",
@@ -639,22 +320,15 @@ let currentUser = null;
 let tournaments = [];
 let publicTournament = null;
 
-
-/* =========================
-   HELPERS
-========================= */
-
+/* HELPERS */
 function id(){
   return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
 }
 
 function esc(value){
   return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
 }
 
 function msg(id,text,type="success"){
@@ -665,183 +339,89 @@ function msg(id,text,type="success"){
 }
 
 function firebaseError(error){
-
-  if(error.code==="auth/email-already-in-use")
-    return "This email already has an account. Login instead.";
-
-  if(error.code==="auth/invalid-email")
-    return "Enter a valid email address.";
-
-  if(error.code==="auth/weak-password")
-    return "Password must be at least 6 characters.";
-
-  if(error.code==="auth/invalid-credential")
-    return "Email or password is incorrect.";
-
+  if(error.code==="auth/email-already-in-use") return "This email already has an account. Login instead.";
+  if(error.code==="auth/invalid-email") return "Enter a valid email address.";
+  if(error.code==="auth/weak-password") return "Password must be at least 6 characters.";
+  if(error.code==="auth/invalid-credential") return "Email or password is incorrect.";
   return error.message || "Something went wrong.";
 }
 
-
-/* =========================
-   AUTH UI
-========================= */
-
+/* AUTH UI */
 window.showRegister=function(){
-
   document.getElementById("loginBox").classList.add("hidden");
   document.getElementById("registerBox").classList.remove("hidden");
-
 };
-
 window.showLogin=function(){
-
   document.getElementById("registerBox").classList.add("hidden");
   document.getElementById("loginBox").classList.remove("hidden");
-
 };
 
-
-/* =========================
-   REGISTER
-========================= */
-
+/* REGISTER */
 window.register=async function(){
-
   const email=document.getElementById("regEmail").value.trim();
   const password=document.getElementById("regPassword").value;
-
   if(!email || !password){
     msg("registerMsg","Email and password required.","error");
     return;
   }
-
   try{
-
-    await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-
+    await createUserWithEmailAndPassword(auth,email,password);
     msg("registerMsg","Account created successfully!","success");
-
   }catch(error){
-
     msg("registerMsg",firebaseError(error),"error");
-
   }
-
 };
 
-
-/* =========================
-   LOGIN
-========================= */
-
+/* LOGIN */
 window.login=async function(){
-
   const email=document.getElementById("loginEmail").value.trim();
   const password=document.getElementById("loginPassword").value;
-
   if(!email || !password){
     msg("loginMsg","Email and password required.","error");
     return;
   }
-
   try{
-
-    await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-
+    await signInWithEmailAndPassword(auth,email,password);
   }catch(error){
-
     msg("loginMsg",firebaseError(error),"error");
-
   }
-
 };
 
-
-/* =========================
-   LOGOUT
-========================= */
-
+/* LOGOUT */
 window.logout=async function(){
-
   await signOut(auth);
-
 };
 
-
-/* =========================
-   AUTH STATE
-========================= */
-
+/* AUTH STATE */
 onAuthStateChanged(auth, async user=>{
-
   currentUser=user;
-
   if(user){
-
     document.getElementById("authScreen").classList.add("hidden");
     document.getElementById("appScreen").classList.remove("hidden");
     document.getElementById("publicScreen").classList.add("hidden");
-
-    document.getElementById("userEmail").textContent=
-      user.email || "";
-
+    document.getElementById("userEmail").textContent=user.email || "";
     await loadTournaments();
-
     showSection("dashboard");
-
   }else{
-
     document.getElementById("authScreen").classList.remove("hidden");
     document.getElementById("appScreen").classList.add("hidden");
-
   }
-
 });
 
-
-/* =========================
-   LOAD TOURNAMENTS
-========================= */
-
+/* LOAD TOURNAMENTS */
 async function loadTournaments(){
-
   if(!currentUser)return;
-
-  const q=query(
-    collection(db,"tournaments"),
-    where("ownerId","==",currentUser.uid)
-  );
-
+  const q=query(collection(db,"tournaments"),where("ownerId","==",currentUser.uid));
   const snap=await getDocs(q);
-
   tournaments=[];
-
   snap.forEach(item=>{
-    tournaments.push({
-      id:item.id,
-      ...item.data()
-    });
+    tournaments.push({id:item.id,...item.data()});
   });
-
   renderAll();
-
 }
 
-
-/* =========================
-   CREATE TOURNAMENT
-========================= */
-
+/* CREATE TOURNAMENT */
 window.createTournament=async function(){
-
   const name=document.getElementById("tournamentName").value.trim();
   const format=document.getElementById("tournamentFormat").value;
   const overs=Number(document.getElementById("tournamentOvers").value);
@@ -852,7 +432,6 @@ window.createTournament=async function(){
   }
 
   const tournamentId=id();
-
   const tournament={
     id:tournamentId,
     ownerId:currentUser.uid,
@@ -863,443 +442,399 @@ window.createTournament=async function(){
     published:false,
     createdAt:Date.now(),
     teams:[],
-    matches:[]
+    matches:[],
+    fixtures:[]
   };
 
   try{
-
-    await setDoc(
-      doc(db,"tournaments",tournamentId),
-      tournament
-    );
-
+    await setDoc(doc(db,"tournaments",tournamentId),tournament);
     document.getElementById("tournamentName").value="";
-
-    msg(
-      "tournamentMsg",
-      "Tournament created successfully!"
-    );
-
+    msg("tournamentMsg","Tournament created successfully!");
     await loadTournaments();
-
   }catch(error){
-
     msg("tournamentMsg",error.message,"error");
-
   }
-
 };
 
-
-/* =========================
-   DELETE TOURNAMENT
-========================= */
-
+/* DELETE TOURNAMENT */
 window.deleteTournament=async function(tournamentId){
-
   if(!confirm("Delete this tournament?"))return;
-
-  await deleteDoc(
-    doc(db,"tournaments",tournamentId)
-  );
-
+  await deleteDoc(doc(db,"tournaments",tournamentId));
   await loadTournaments();
-
 };
 
-
-/* =========================
-   PUBLISH TOURNAMENT
-========================= */
-
+/* PUBLISH TOURNAMENT */
 window.togglePublish=async function(tournamentId){
-
   const t=tournaments.find(x=>x.id===tournamentId);
-
   if(!t)return;
-
-  await updateDoc(
-    doc(db,"tournaments",tournamentId),
-    {
-      published:!t.published
-    }
-  );
-
+  await updateDoc(doc(db,"tournaments",tournamentId),{published:!t.published});
   await loadTournaments();
-
 };
 
-
-/* =========================
-   PUBLIC LINK
-========================= */
-
+/* PUBLIC LINK */
 window.copyPublicLink=function(tournamentId){
-
-  const url=
-    location.origin+
-    location.pathname+
-    "?t="+encodeURIComponent(tournamentId);
-
+  const url=location.origin+location.pathname+"?t="+encodeURIComponent(tournamentId);
   navigator.clipboard.writeText(url)
-    .then(()=>{
-      alert("Public tournament link copied!");
-    })
-    .catch(()=>{
-      prompt("Copy this link:",url);
-    });
-
+    .then(()=>{alert("Public tournament link copied!");})
+    .catch(()=>{prompt("Copy this link:",url);});
 };
-
 
 window.openPublic=function(tournamentId){
-
-  const url=
-    location.origin+
-    location.pathname+
-    "?t="+encodeURIComponent(tournamentId);
-
+  const url=location.origin+location.pathname+"?t="+encodeURIComponent(tournamentId);
   window.open(url,"_blank");
-
 };
 
-
-/* =========================
-   ADD TEAM
-========================= */
-
+/* ADD TEAM */
 window.addTeam=async function(){
-
-  const tournamentId=
-    document.getElementById("teamTournament").value;
-
-  const name=
-    document.getElementById("teamName").value.trim();
+  const tournamentId=document.getElementById("teamTournament").value;
+  const name=document.getElementById("teamName").value.trim();
 
   if(!tournamentId){
-
-    msg(
-      "teamMsg",
-      "Please choose a tournament first.",
-      "error"
-    );
-
+    msg("teamMsg","Please choose a tournament first.","error");
     return;
   }
-
   if(!name){
-
-    msg(
-      "teamMsg",
-      "Enter team name.",
-      "error"
-    );
-
+    msg("teamMsg","Enter team name.","error");
     return;
   }
 
-  const t=tournaments.find(
-    x=>x.id===tournamentId
-  );
-
+  const t=tournaments.find(x=>x.id===tournamentId);
   if(!t)return;
 
   const teams=[...(t.teams || [])];
 
-  if(
-    teams.some(
-      x=>x.name.toLowerCase()===name.toLowerCase()
-    )
-  ){
-
-    msg(
-      "teamMsg",
-      "This team already exists in this tournament.",
-      "error"
-    );
-
+  if(teams.some(x=>x.name.toLowerCase()===name.toLowerCase())){
+    msg("teamMsg","This team already exists in this tournament.","error");
     return;
   }
 
-  teams.push({
-    id:id(),
-    name:name
+  teams.push({id:id(),name:name});
+
+  try{
+    await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams});
+    document.getElementById("teamName").value="";
+    msg("teamMsg","Team added successfully! (Teams badalne par fixtures dobara generate karein)");
+    await loadTournaments();
+  }catch(error){
+    msg("teamMsg",error.message,"error");
+  }
+};
+
+/* DELETE TEAM */
+window.deleteTeam=async function(tournamentId,teamId){
+  const t=tournaments.find(x=>x.id===tournamentId);
+  if(!t)return;
+  const teams=(t.teams || []).filter(x=>x.id!==teamId);
+  const fixtures=(t.fixtures || []).filter(f=>f.a!==teamId && f.b!==teamId);
+  await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams,fixtures:fixtures});
+  await loadTournaments();
+};
+
+/* =========================
+   FIXTURES (AUTO GENERATE)
+========================= */
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+// Circle method: every team plays every other team once.
+function roundRobin(teamIds){
+  const list=[...teamIds];
+  if(list.length%2===1)list.push(null); // BYE
+  const n=list.length;
+  const rounds=[];
+
+  for(let r=0;r<n-1;r++){
+    const pairs=[];
+    for(let i=0;i<n/2;i++){
+      const home=list[i];
+      const away=list[n-1-i];
+      if(home && away){
+        // alternate sides so same team is not always Team A
+        pairs.push((r+i)%2===0 ? [home,away] : [away,home]);
+      }
+    }
+    rounds.push(pairs);
+    list.splice(1,0,list.pop()); // rotate all except first
+  }
+  return rounds;
+}
+
+window.generateFixtures=async function(){
+  const tournamentId=document.getElementById("fixtureTournament").value;
+  const mode=document.getElementById("fixtureMode").value;
+
+  if(!tournamentId){
+    msg("fixtureMsg","Pehle tournament choose karein.","error");
+    return;
+  }
+
+  const t=tournaments.find(x=>x.id===tournamentId);
+  if(!t)return;
+
+  const teamIds=(t.teams || []).map(x=>x.id);
+
+  if(teamIds.length<2){
+    msg("fixtureMsg","Fixtures ke liye kam az kam 2 teams chahiye.","error");
+    return;
+  }
+
+  if((t.fixtures || []).length &&
+     !confirm("Purane fixtures delete ho kar naye ban jayenge. Continue?"))return;
+
+  const fixtures=[];
+
+  if(t.format==="Knockout"){
+    const order=shuffle(teamIds);
+    for(let i=0;i<order.length;i+=2){
+      fixtures.push({
+        id:id(),
+        round:"Round 1",
+        a:order[i],
+        b:order[i+1] || "BYE",
+        matchId:""
+      });
+    }
+  }else{
+    let rounds=roundRobin(shuffle(teamIds));
+    if(mode==="double"){
+      const second=rounds.map(r=>r.map(p=>[p[1],p[0]]));
+      rounds=rounds.concat(second);
+    }
+    rounds.forEach((pairs,index)=>{
+      pairs.forEach(p=>{
+        fixtures.push({
+          id:id(),
+          round:"Round "+(index+1),
+          a:p[0],
+          b:p[1],
+          matchId:""
+        });
+      });
+    });
+  }
+
+  // Link already-played matches so they show as completed.
+  const used=new Set();
+  (t.matches || []).forEach(m=>{
+    const f=fixtures.find(x=>
+      !x.matchId &&
+      ((x.a===m.a && x.b===m.b) || (x.a===m.b && x.b===m.a))
+    );
+    if(f && !used.has(m.id)){
+      f.matchId=m.id;
+      used.add(m.id);
+    }
   });
 
   try{
-
-    await updateDoc(
-      doc(db,"tournaments",tournamentId),
-      {teams:teams}
-    );
-
-    document.getElementById("teamName").value="";
-
-    msg(
-      "teamMsg",
-      "Team added successfully!"
-    );
-
+    await updateDoc(doc(db,"tournaments",tournamentId),{fixtures:fixtures});
+    msg("fixtureMsg",fixtures.length+" fixtures generate ho gaye!");
     await loadTournaments();
-
   }catch(error){
+    msg("fixtureMsg",error.message,"error");
+  }
+};
 
-    msg("teamMsg",error.message,"error");
+window.clearFixtures=async function(){
+  const tournamentId=document.getElementById("fixtureTournament").value;
+  if(!tournamentId){
+    msg("fixtureMsg","Pehle tournament choose karein.","error");
+    return;
+  }
+  if(!confirm("Saare fixtures delete karne hain?"))return;
+  await updateDoc(doc(db,"tournaments",tournamentId),{fixtures:[]});
+  msg("fixtureMsg","Fixtures clear ho gaye.");
+  await loadTournaments();
+};
 
+// Open match scoring with the fixture teams pre-selected.
+window.scoreFixture=function(tournamentId,fixtureId){
+  const t=tournaments.find(x=>x.id===tournamentId);
+  if(!t)return;
+  const f=(t.fixtures || []).find(x=>x.id===fixtureId);
+  if(!f)return;
+
+  showSection("matches");
+  document.getElementById("matchTournament").value=tournamentId;
+  loadMatchTeams();
+  document.getElementById("matchTeamA").value=f.a;
+  document.getElementById("matchTeamB").value=f.b;
+};
+
+function fixturesHTML(t,admin){
+  const fixtures=t.fixtures || [];
+  if(!fixtures.length){
+    return '<p class="muted">No fixtures yet.</p>';
   }
 
+  const name=tid=>(t.teams || []).find(x=>x.id===tid)?.name || "BYE";
+  const rounds=[];
+  fixtures.forEach(f=>{
+    if(!rounds.includes(f.round))rounds.push(f.round);
+  });
+
+  let html="";
+  rounds.forEach(round=>{
+    html+=`<h3 class="fix-round">&gt; ${esc(round)}</h3>`;
+    fixtures.filter(f=>f.round===round).forEach(f=>{
+      const done=!!f.matchId;
+      const bye=f.b==="BYE";
+      html+=`
+        <div class="match-row fix-row">
+          <strong>${esc(name(f.a))} <span class="muted">vs</span> ${esc(name(f.b))}</strong>
+          <span>
+            <span class="badge ${done ? "done" : ""}">
+              ${bye ? "BYE" : done ? "PLAYED" : "UPCOMING"}
+            </span>
+            ${admin && !done && !bye
+              ? `<button class="small secondary" onclick="scoreFixture('${t.id}','${f.id}')">Score</button>`
+              : ""}
+          </span>
+        </div>`;
+    });
+  });
+  return html;
+}
+
+window.renderFixtures=function(){
+  const tournamentId=document.getElementById("fixtureTournament").value;
+  const box=document.getElementById("fixtureList");
+  const t=tournaments.find(x=>x.id===tournamentId);
+  box.innerHTML=t ? fixturesHTML(t,true) : '<p class="muted">Tournament choose karein.</p>';
 };
 
-
-/* =========================
-   DELETE TEAM
-========================= */
-
-window.deleteTeam=async function(
-  tournamentId,
-  teamId
-){
-
-  const t=tournaments.find(
-    x=>x.id===tournamentId
-  );
-
-  if(!t)return;
-
-  const teams=(t.teams || [])
-    .filter(x=>x.id!==teamId);
-
-  await updateDoc(
-    doc(db,"tournaments",tournamentId),
-    {teams:teams}
-  );
-
-  await loadTournaments();
-
-};
-
-
-/* =========================
-   ADD MATCH
-========================= */
-
+/* ADD MATCH */
 window.addMatch=async function(){
-
-  const tournamentId=
-    document.getElementById("matchTournament").value;
-
-  const a=
-    document.getElementById("matchTeamA").value;
-
-  const b=
-    document.getElementById("matchTeamB").value;
-
-  const ra=
-    Number(document.getElementById("runsA").value);
-
-  const rb=
-    Number(document.getElementById("runsB").value);
-
-  const wa=
-    Number(document.getElementById("wicketsA").value);
-
-  const wb=
-    Number(document.getElementById("wicketsB").value);
-
-  const oa=
-    Number(document.getElementById("oversA").value);
-
-  const ob=
-    Number(document.getElementById("oversB").value);
-
-  const type=
-    document.getElementById("matchResult").value;
+  const tournamentId=document.getElementById("matchTournament").value;
+  const a=document.getElementById("matchTeamA").value;
+  const b=document.getElementById("matchTeamB").value;
+  const ra=Number(document.getElementById("runsA").value);
+  const rb=Number(document.getElementById("runsB").value);
+  const wa=Number(document.getElementById("wicketsA").value);
+  const wb=Number(document.getElementById("wicketsB").value);
+  const oa=Number(document.getElementById("oversA").value);
+  const ob=Number(document.getElementById("oversB").value);
+  const type=document.getElementById("matchResult").value;
 
   if(!tournamentId){
     msg("matchMsg","Choose tournament.","error");
     return;
   }
-
   if(!a || !b){
     msg("matchMsg","Choose both teams.","error");
     return;
   }
-
   if(a===b){
     msg("matchMsg","Team A and Team B must be different.","error");
     return;
   }
 
-  const t=tournaments.find(
-    x=>x.id===tournamentId
-  );
-
+  const t=tournaments.find(x=>x.id===tournamentId);
   if(!t)return;
 
   const matches=[...(t.matches || [])];
+  const matchId=id();
 
   matches.push({
-    id:id(),
-    a:a,
-    b:b,
-    ra:ra || 0,
-    rb:rb || 0,
-    wa:wa || 0,
-    wb:wb || 0,
-    oa:oa || 0,
-    ob:ob || 0,
+    id:matchId,
+    a:a,b:b,
+    ra:ra || 0,rb:rb || 0,
+    wa:wa || 0,wb:wb || 0,
+    oa:oa || 0,ob:ob || 0,
     type:type,
     createdAt:Date.now()
   });
 
-  await updateDoc(
-    doc(db,"tournaments",tournamentId),
-    {matches:matches}
+  // Mark the matching fixture as played.
+  const fixtures=(t.fixtures || []).map(f=>({...f}));
+  const fx=fixtures.find(f=>
+    !f.matchId &&
+    ((f.a===a && f.b===b) || (f.a===b && f.b===a))
   );
+  if(fx)fx.matchId=matchId;
 
-  document.getElementById("runsA").value="";
-  document.getElementById("runsB").value="";
-  document.getElementById("wicketsA").value="";
-  document.getElementById("wicketsB").value="";
-  document.getElementById("oversA").value="";
-  document.getElementById("oversB").value="";
+  await updateDoc(doc(db,"tournaments",tournamentId),{matches:matches,fixtures:fixtures});
+
+  ["runsA","runsB","wicketsA","wicketsB","oversA","oversB"]
+    .forEach(x=>document.getElementById(x).value="");
 
   msg("matchMsg","Match saved successfully!");
-
   await loadTournaments();
-
 };
 
-
-/* =========================
-   DELETE MATCH
-========================= */
-
-window.deleteMatch=async function(
-  tournamentId,
-  matchId
-){
-
-  const t=tournaments.find(
-    x=>x.id===tournamentId
-  );
-
+/* DELETE MATCH */
+window.deleteMatch=async function(tournamentId,matchId){
+  const t=tournaments.find(x=>x.id===tournamentId);
   if(!t)return;
 
-  const matches=(t.matches || [])
-    .filter(x=>x.id!==matchId);
-
-  await updateDoc(
-    doc(db,"tournaments",tournamentId),
-    {matches:matches}
+  const matches=(t.matches || []).filter(x=>x.id!==matchId);
+  const fixtures=(t.fixtures || []).map(f=>
+    f.matchId===matchId ? {...f,matchId:""} : f
   );
 
+  await updateDoc(doc(db,"tournaments",tournamentId),{matches:matches,fixtures:fixtures});
   await loadTournaments();
-
 };
 
-
-/* =========================
-   NAVIGATION
-========================= */
-
+/* NAVIGATION */
 window.showSection=function(section){
-
-  document.querySelectorAll(".section")
-    .forEach(x=>x.classList.add("hidden"));
-
+  document.querySelectorAll(".section").forEach(x=>x.classList.add("hidden"));
   const target=document.getElementById(section);
+  if(target)target.classList.remove("hidden");
 
-  if(target)
-    target.classList.remove("hidden");
-
-  document.querySelectorAll("nav button")
-    .forEach(x=>x.classList.remove("active"));
-
-  const nav=document.getElementById(
-    "nav"+section.charAt(0).toUpperCase()+section.slice(1)
-  );
-
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+  const nav=document.getElementById("nav"+section.charAt(0).toUpperCase()+section.slice(1));
   if(nav)nav.classList.add("active");
 
   renderAll();
-
 };
 
-
-/* =========================
-   TOURNAMENT DROPDOWNS
-   IMPORTANT FIX
-========================= */
-
+/* TOURNAMENT DROPDOWNS */
 function populateTournamentDropdowns(){
-
-  const ids=[
-    "teamTournament",
-    "matchTournament",
-    "pointsTournament"
-  ];
+  const ids=["teamTournament","fixtureTournament","matchTournament","pointsTournament"];
 
   ids.forEach(dropdownId=>{
-
-    const select=
-      document.getElementById(dropdownId);
-
+    const select=document.getElementById(dropdownId);
     if(!select)return;
 
     const oldValue=select.value;
-
-    select.innerHTML=
-      '<option value="">Choose Tournament</option>';
+    select.innerHTML='<option value="">Choose Tournament</option>';
 
     tournaments.forEach(t=>{
-
       const option=document.createElement("option");
-
       option.value=t.id;
-      option.textContent=
-        t.name+
-        (t.published ? " ✓" : "");
-
+      option.textContent=t.name+(t.published ? " ✓" : "");
       select.appendChild(option);
-
     });
 
-    if(
-      oldValue &&
-      tournaments.some(x=>x.id===oldValue)
-    ){
+    if(oldValue && tournaments.some(x=>x.id===oldValue)){
       select.value=oldValue;
     }
-
   });
-
 }
 
-
-/* =========================
-   MATCH TEAMS
-========================= */
-
+/* MATCH TEAMS */
 window.loadMatchTeams=function(){
-
-  const tournamentId=
-    document.getElementById("matchTournament").value;
-
+  const tournamentId=document.getElementById("matchTournament").value;
   const a=document.getElementById("matchTeamA");
   const b=document.getElementById("matchTeamB");
+  const oldA=a.value;
+  const oldB=b.value;
 
   a.innerHTML='<option value="">Choose Team A</option>';
   b.innerHTML='<option value="">Choose Team B</option>';
 
-  const t=tournaments.find(
-    x=>x.id===tournamentId
-  );
-
+  const t=tournaments.find(x=>x.id===tournamentId);
   if(!t)return;
 
   (t.teams || []).forEach(team=>{
-
     const oa=document.createElement("option");
     oa.value=team.id;
     oa.textContent=team.name;
@@ -1310,681 +845,472 @@ window.loadMatchTeams=function(){
 
     a.appendChild(oa);
     b.appendChild(ob);
-
   });
 
+  // keep previous selection when list is just refreshed
+  if(oldA && (t.teams || []).some(x=>x.id===oldA))a.value=oldA;
+  if(oldB && (t.teams || []).some(x=>x.id===oldB))b.value=oldB;
 };
 
+/* POINTS TABLE CALCULATION */
 
-/* =========================
-   POINTS TABLE CALCULATION
-========================= */
-
-
-/* =========================
-   POINTS TABLE CALCULATION
-   FIXED NRR CALCULATION
-========================= */
-
-// Convert cricket overs into actual balls.
-// Example: 9.3 overs = 57 balls, not 9.3 overs.
-function oversToBalls(overs) {
-  const value = Number(overs) || 0;
-
-  const wholeOvers = Math.floor(value);
-  const balls = Math.round((value - wholeOvers) * 10);
-
-  if (balls < 0 || balls > 5) {
-    return wholeOvers * 6;
+// Convert cricket overs into actual balls. Example: 9.3 overs = 57 balls.
+function oversToBalls(overs){
+  const value=Number(overs) || 0;
+  const wholeOvers=Math.floor(value);
+  const balls=Math.round((value-wholeOvers)*10);
+  if(balls<0 || balls>5){
+    return wholeOvers*6;
   }
-
-  return wholeOvers * 6 + balls;
+  return wholeOvers*6+balls;
 }
 
-function calculatePoints(t) {
-  const stats = {};
+function calculatePoints(t){
+  const stats={};
 
-  (t.teams || []).forEach(team => {
-    stats[team.id] = {
-      id: team.id,
-      name: team.name,
-      p: 0,
-      w: 0,
-      l: 0,
-      tie: 0,
-      nr: 0,
-      pts: 0,
-      rf: 0,
-      ballsFaced: 0,
-      ra: 0,
-      ballsBowled: 0,
-      nrr: 0
+  (t.teams || []).forEach(team=>{
+    stats[team.id]={
+      id:team.id,name:team.name,
+      p:0,w:0,l:0,tie:0,nr:0,pts:0,
+      rf:0,ballsFaced:0,ra:0,ballsBowled:0,nrr:0
     };
   });
 
-  (t.matches || []).forEach(m => {
-    if (!stats[m.a] || !stats[m.b]) return;
+  (t.matches || []).forEach(m=>{
+    if(!stats[m.a] || !stats[m.b])return;
 
-    const A = stats[m.a];
-    const B = stats[m.b];
+    const A=stats[m.a];
+    const B=stats[m.b];
 
-    const runsA = Number(m.ra) || 0;
-    const runsB = Number(m.rb) || 0;
-    const wicketsA = Number(m.wa) || 0;
-    const wicketsB = Number(m.wb) || 0;
+    const runsA=Number(m.ra) || 0;
+    const runsB=Number(m.rb) || 0;
+    const wicketsA=Number(m.wa) || 0;
+    const wicketsB=Number(m.wb) || 0;
 
-    const quotaBalls = oversToBalls(t.overs);
+    const quotaBalls=oversToBalls(t.overs);
 
-    // All-out innings count as having used the
-    // full allotted overs for NRR purposes.
-    const ballsA = wicketsA >= 10
-      ? quotaBalls
-      : oversToBalls(m.oa);
-
-    const ballsB = wicketsB >= 10
-      ? quotaBalls
-      : oversToBalls(m.ob);
+    // All-out innings count as the full allotted overs for NRR.
+    const ballsA=wicketsA>=10 ? quotaBalls : oversToBalls(m.oa);
+    const ballsB=wicketsB>=10 ? quotaBalls : oversToBalls(m.ob);
 
     A.p++;
     B.p++;
 
-    // No-result matches award points but do not
-    // contribute runs or overs to NRR.
-    if (m.type === "noresult") {
-      A.nr++;
-      B.nr++;
-      A.pts++;
-      B.pts++;
+    // No-result: points awarded, nothing counted for NRR.
+    if(m.type==="noresult"){
+      A.nr++;B.nr++;
+      A.pts++;B.pts++;
       return;
     }
 
-    // Include runs and balls for completed matches.
-    A.rf += runsA;
-    A.ballsFaced += ballsA;
-    A.ra += runsB;
-    A.ballsBowled += ballsB;
+    A.rf+=runsA;
+    A.ballsFaced+=ballsA;
+    A.ra+=runsB;
+    A.ballsBowled+=ballsB;
 
-    B.rf += runsB;
-    B.ballsFaced += ballsB;
-    B.ra += runsA;
-    B.ballsBowled += ballsA;
+    B.rf+=runsB;
+    B.ballsFaced+=ballsB;
+    B.ra+=runsA;
+    B.ballsBowled+=ballsA;
 
-    if (m.type === "tie") {
-      A.tie++;
-      B.tie++;
-      A.pts++;
-      B.pts++;
+    if(m.type==="tie"){
+      A.tie++;B.tie++;
+      A.pts++;B.pts++;
       return;
     }
 
-    if (runsA > runsB) {
-      A.w++;
-      B.l++;
-      A.pts += 2;
-    } else if (runsB > runsA) {
-      B.w++;
-      A.l++;
-      B.pts += 2;
-    } else {
-      A.tie++;
-      B.tie++;
-      A.pts++;
-      B.pts++;
+    if(runsA>runsB){
+      A.w++;B.l++;
+      A.pts+=2;
+    }else if(runsB>runsA){
+      B.w++;A.l++;
+      B.pts+=2;
+    }else{
+      A.tie++;B.tie++;
+      A.pts++;B.pts++;
     }
   });
 
   return Object.values(stats)
-    .map(team => {
-      const runRateFor = team.ballsFaced > 0
-        ? (team.rf * 6) / team.ballsFaced
-        : 0;
-
-      const runRateAgainst = team.ballsBowled > 0
-        ? (team.ra * 6) / team.ballsBowled
-        : 0;
-
-      team.nrr = runRateFor - runRateAgainst;
-
+    .map(team=>{
+      const rrFor=team.ballsFaced>0 ? (team.rf*6)/team.ballsFaced : 0;
+      const rrAgainst=team.ballsBowled>0 ? (team.ra*6)/team.ballsBowled : 0;
+      team.nrr=rrFor-rrAgainst;
       return team;
     })
-    .sort((a, b) => {
-      if (b.pts !== a.pts) {
-        return b.pts - a.pts;
-      }
-
-      return b.nrr - a.nrr;
+    .sort((a,b)=>{
+      if(b.pts!==a.pts)return b.pts-a.pts;
+      return b.nrr-a.nrr;
     });
 }
 
-
-/* =========================
-   RENDER POINTS
-========================= */
+/* RENDER POINTS */
+function pointsRow(x){
+  return `
+    <td>${esc(x.name)}</td>
+    <td>${x.p}</td>
+    <td>${x.w}</td>
+    <td>${x.l}</td>
+    <td>${x.tie}</td>
+    <td>${x.nr}</td>
+    <td><strong>${x.pts}</strong></td>
+    <td>${x.nrr.toFixed(2)}</td>`;
+}
 
 window.renderPoints=function(){
-
-  const tournamentId=
-    document.getElementById("pointsTournament").value;
-
-  const body=
-    document.getElementById("pointsBody");
-
+  const tournamentId=document.getElementById("pointsTournament").value;
+  const body=document.getElementById("pointsBody");
   body.innerHTML="";
 
-  const t=tournaments.find(
-    x=>x.id===tournamentId
-  );
-
+  const t=tournaments.find(x=>x.id===tournamentId);
   if(!t)return;
 
-  const rows=calculatePoints(t);
-
-  rows.forEach(x=>{
-
+  calculatePoints(t).forEach(x=>{
     const tr=document.createElement("tr");
-
-    tr.innerHTML=`
-      <td>${esc(x.name)}</td>
-      <td>${x.p}</td>
-      <td>${x.w}</td>
-      <td>${x.l}</td>
-      <td>${x.tie}</td>
-      <td>${x.nr}</td>
-      <td><strong>${x.pts}</strong></td>
-      <td>${x.nrr.toFixed(2)}</td>
-    `;
-
+    tr.innerHTML=pointsRow(x);
     body.appendChild(tr);
-
   });
-
 };
 
-
-/* =========================
-   RENDER ALL
-========================= */
-
+/* RENDER ALL */
 function renderAll(){
-
   populateTournamentDropdowns();
-
   renderTournaments();
   renderTeams();
   renderMatches();
   renderDashboard();
+  renderFixtures();
 
-  const matchTournament=
-    document.getElementById("matchTournament");
-
-  if(matchTournament &&
-     matchTournament.value){
-
+  const matchTournament=document.getElementById("matchTournament");
+  if(matchTournament && matchTournament.value){
     loadMatchTeams();
-
   }
 
-  const pointsTournament=
-    document.getElementById("pointsTournament");
-
-  if(pointsTournament &&
-     pointsTournament.value){
-
+  const pointsTournament=document.getElementById("pointsTournament");
+  if(pointsTournament && pointsTournament.value){
     renderPoints();
-
   }
-
 }
 
-
-/* =========================
-   DASHBOARD
-========================= */
-
+/* DASHBOARD */
 function renderDashboard(){
-
   let teams=0;
   let matches=0;
 
   tournaments.forEach(t=>{
-
     teams+=(t.teams || []).length;
     matches+=(t.matches || []).length;
-
   });
 
-  document.getElementById(
-    "dashTournaments"
-  ).textContent=tournaments.length;
-
-  document.getElementById(
-    "dashTeams"
-  ).textContent=teams;
-
-  document.getElementById(
-    "dashMatches"
-  ).textContent=matches;
-
+  document.getElementById("dashTournaments").textContent=tournaments.length;
+  document.getElementById("dashTeams").textContent=teams;
+  document.getElementById("dashMatches").textContent=matches;
 }
 
-
-/* =========================
-   RENDER TOURNAMENTS
-========================= */
-
+/* RENDER TOURNAMENTS */
 function renderTournaments(){
-
-  const box=
-    document.getElementById("tournamentList");
-
+  const box=document.getElementById("tournamentList");
   box.innerHTML="";
 
   if(tournaments.length===0){
-
-    box.innerHTML=
-      '<p class="muted">No tournaments yet.</p>';
-
+    box.innerHTML='<p class="muted">No tournaments yet.</p>';
     return;
   }
 
   tournaments.forEach(t=>{
-
     const div=document.createElement("div");
-
     div.className="tournament-row";
 
     div.innerHTML=`
-
       <h3>${esc(t.name)}</h3>
+      <p class="muted">${esc(t.format)} • ${t.overs} overs</p>
+      <p><span class="badge">${t.published ? "PUBLIC" : "PRIVATE"}</span></p>
 
-      <p class="muted">
-        ${esc(t.format)} • ${t.overs} overs
-      </p>
-
-      <p>
-        <span class="badge">
-          ${t.published ? "PUBLIC" : "PRIVATE"}
-        </span>
-      </p>
-
-      <button
-        class="${t.published ? "gray" : ""}"
-        onclick="togglePublish('${t.id}')">
+      <button class="${t.published ? "gray" : ""}" onclick="togglePublish('${t.id}')">
         ${t.published ? "Unpublish" : "Publish"}
       </button>
 
-      ${
-        t.published
-        ? `
-          <button
-            class="secondary"
-            onclick="copyPublicLink('${t.id}')">
-            Copy Public Link
-          </button>
+      ${t.published ? `
+        <button class="secondary" onclick="copyPublicLink('${t.id}')">Copy Public Link</button>
+        <button class="secondary" onclick="openPublic('${t.id}')">Open Public</button>
+      ` : ""}
 
-          <button
-            class="secondary"
-            onclick="openPublic('${t.id}')">
-            Open Public
-          </button>
-        `
-        : ""
-      }
-
-      <button
-        class="danger"
-        onclick="deleteTournament('${t.id}')">
-        Delete
-      </button>
+      <button class="danger" onclick="deleteTournament('${t.id}')">Delete</button>
     `;
 
     box.appendChild(div);
-
   });
-
 }
 
-
-/* =========================
-   RENDER TEAMS
-========================= */
-
+/* RENDER TEAMS */
 function renderTeams(){
-
-  const box=
-    document.getElementById("teamList");
-
+  const box=document.getElementById("teamList");
   box.innerHTML="";
 
   tournaments.forEach(t=>{
-
     if(!(t.teams || []).length)return;
 
     const title=document.createElement("h3");
-
     title.textContent=t.name;
-
     box.appendChild(title);
 
     t.teams.forEach(team=>{
-
       const div=document.createElement("div");
-
       div.className="team-row";
-
       div.innerHTML=`
         <strong>${esc(team.name)}</strong>
-
-        <button
-          class="danger small"
-          style="float:right"
-          onclick="deleteTeam('${t.id}','${team.id}')">
-          Delete
-        </button>
+        <button class="danger small" style="float:right" onclick="deleteTeam('${t.id}','${team.id}')">Delete</button>
       `;
-
       box.appendChild(div);
-
     });
-
   });
-
 }
 
-
-/* =========================
-   RENDER MATCHES
-========================= */
-
+/* RENDER MATCHES */
 function renderMatches(){
-
-  const box=
-    document.getElementById("matchList");
-
+  const box=document.getElementById("matchList");
   box.innerHTML="";
 
   tournaments.forEach(t=>{
-
     (t.matches || []).forEach(m=>{
-
-      const teamA=
-        (t.teams || []).find(x=>x.id===m.a);
-
-      const teamB=
-        (t.teams || []).find(x=>x.id===m.b);
+      const teamA=(t.teams || []).find(x=>x.id===m.a);
+      const teamB=(t.teams || []).find(x=>x.id===m.b);
 
       const div=document.createElement("div");
-
       div.className="match-row";
 
       div.innerHTML=`
-
         <strong>${esc(t.name)}</strong>
-
         <p>
           ${esc(teamA?.name || "Team A")}
-          <strong>${m.ra}</strong>
-          -
-          <strong>${m.rb}</strong>
+          <strong>${m.ra}</strong> - <strong>${m.rb}</strong>
           ${esc(teamB?.name || "Team B")}
         </p>
-
-        <p class="muted">
-          Overs: ${m.oa} - ${m.ob}
-        </p>
-
-        <button
-          class="danger small"
-          onclick="deleteMatch('${t.id}','${m.id}')">
-          Delete
-        </button>
+        <p class="muted">Overs: ${m.oa} - ${m.ob}</p>
+        <button class="danger small" onclick="deleteMatch('${t.id}','${m.id}')">Delete</button>
       `;
 
       box.appendChild(div);
-
     });
-
   });
-
 }
 
-
-/* =========================
-   PUBLIC TOURNAMENT
-========================= */
-
+/* PUBLIC TOURNAMENT */
 async function loadPublicTournament(){
-
-  const params=
-    new URLSearchParams(location.search);
-
+  const params=new URLSearchParams(location.search);
   const tournamentId=params.get("t");
-
   if(!tournamentId)return;
 
   try{
-
-    const snap=await getDoc(
-      doc(db,"tournaments",tournamentId)
-    );
+    const snap=await getDoc(doc(db,"tournaments",tournamentId));
 
     if(!snap.exists()){
-
       showPublicError("Tournament not found.");
       return;
-
     }
 
-    const t={
-      id:snap.id,
-      ...snap.data()
-    };
+    const t={id:snap.id,...snap.data()};
 
     if(t.published!==true){
-
-      showPublicError(
-        "This tournament is not public."
-      );
-
+      showPublicError("This tournament is not public.");
       return;
-
     }
 
     publicTournament=t;
 
-    document.getElementById(
-      "authScreen"
-    ).classList.add("hidden");
-
-    document.getElementById(
-      "appScreen"
-    ).classList.add("hidden");
-
-    document.getElementById(
-      "publicScreen"
-    ).classList.remove("hidden");
+    document.getElementById("authScreen").classList.add("hidden");
+    document.getElementById("appScreen").classList.add("hidden");
+    document.getElementById("publicScreen").classList.remove("hidden");
 
     renderPublic(t);
-
   }catch(error){
-
     showPublicError(error.message);
-
   }
-
 }
-
 
 function showPublicError(text){
-
-  document.getElementById(
-    "authScreen"
-  ).classList.add("hidden");
-
-  document.getElementById(
-    "appScreen"
-  ).classList.add("hidden");
-
-  document.getElementById(
-    "publicScreen"
-  ).classList.remove("hidden");
-
-  document.getElementById(
-    "publicTitle"
-  ).textContent="RC24 Tournament";
-
-  document.getElementById(
-    "publicInfo"
-  ).textContent=text;
-
+  document.getElementById("authScreen").classList.add("hidden");
+  document.getElementById("appScreen").classList.add("hidden");
+  document.getElementById("publicScreen").classList.remove("hidden");
+  document.getElementById("publicTitle").textContent="RC24 Tournament";
+  document.getElementById("publicInfo").textContent=text;
 }
 
-
-/* =========================
-   RENDER PUBLIC
-========================= */
-
+/* RENDER PUBLIC */
 function renderPublic(t){
+  document.getElementById("publicTitle").textContent=t.name;
+  document.getElementById("publicInfo").textContent=`${t.format} • ${t.overs} overs`;
 
-  document.getElementById(
-    "publicTitle"
-  ).textContent=t.name;
-
-  document.getElementById(
-    "publicInfo"
-  ).textContent=
-    `${t.format} • ${t.overs} overs`;
-
-  const teamsBox=
-    document.getElementById("publicTeams");
-
+  const teamsBox=document.getElementById("publicTeams");
   teamsBox.innerHTML="";
-
   (t.teams || []).forEach(team=>{
-
     const div=document.createElement("div");
-
     div.className="team-row";
-
     div.textContent=team.name;
-
     teamsBox.appendChild(div);
-
   });
 
+  document.getElementById("publicFixtures").innerHTML=fixturesHTML(t,false);
 
-  const matchesBox=
-    document.getElementById("publicMatches");
-
+  const matchesBox=document.getElementById("publicMatches");
   matchesBox.innerHTML="";
 
   (t.matches || []).forEach(m=>{
-
-    const A=
-      (t.teams || []).find(x=>x.id===m.a);
-
-    const B=
-      (t.teams || []).find(x=>x.id===m.b);
+    const A=(t.teams || []).find(x=>x.id===m.a);
+    const B=(t.teams || []).find(x=>x.id===m.b);
 
     const div=document.createElement("div");
-
     div.className="match-row";
-
     div.innerHTML=`
       <strong>
-        ${esc(A?.name || "Team A")}
-        ${m.ra}
-        -
-        ${m.rb}
-        ${esc(B?.name || "Team B")}
+        ${esc(A?.name || "Team A")} ${m.ra} - ${m.rb} ${esc(B?.name || "Team B")}
       </strong>
-
-      <p class="muted">
-        Overs: ${m.oa} - ${m.ob}
-      </p>
+      <p class="muted">Overs: ${m.oa} - ${m.ob}</p>
     `;
-
     matchesBox.appendChild(div);
-
   });
 
-
-  const body=
-    document.getElementById("publicPointsBody");
-
+  const body=document.getElementById("publicPointsBody");
   body.innerHTML="";
-
   calculatePoints(t).forEach(x=>{
-
     const tr=document.createElement("tr");
-
-    tr.innerHTML=`
-      <td>${esc(x.name)}</td>
-      <td>${x.p}</td>
-      <td>${x.w}</td>
-      <td>${x.l}</td>
-      <td>${x.tie}</td>
-      <td>${x.nr}</td>
-      <td><strong>${x.pts}</strong></td>
-      <td>${x.nrr.toFixed(2)}</td>
-    `;
-
+    tr.innerHTML=pointsRow(x);
     body.appendChild(tr);
-
   });
-
 }
 
-
-/* =========================
-   CREATE YOUR OWN
-========================= */
-
+/* CREATE YOUR OWN */
 window.createOwnTournament=function(){
-
-  location.href=
-    location.origin+
-    location.pathname;
-
+  location.href=location.origin+location.pathname;
 };
 
-
-/* =========================
-   START
-========================= */
-
-if(
-  new URLSearchParams(location.search).has("t")
-){
-
+/* START */
+if(new URLSearchParams(location.search).has("t")){
   loadPublicTournament();
-
 }
 
 </script>
 
+<!-- INTRO SCRIPT -->
 <script>
 (function () {
   const intro = document.getElementById("rehan-intro");
   const skip = document.getElementById("rehan-skip");
-
   if (!intro || !skip) return;
 
   let closed = false;
-
   function closeIntro() {
     if (closed) return;
     closed = true;
-
     intro.classList.add("rehan-hide");
-
-    window.setTimeout(function () {
-      intro.remove();
-    }, 850);
+    window.setTimeout(function () { intro.remove(); }, 850);
   }
-
   skip.addEventListener("click", closeIntro);
   window.setTimeout(closeIntro, 3500);
+})();
+</script>
+
+<!-- 3D HACKER BACKGROUND SCRIPT -->
+<script>
+(function () {
+  const cv = document.getElementById("hackerBg");
+  const ctx = cv.getContext("2d");
+  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const CHARS = "01アイウエオカキクケコサシスセソタチツテトナニヌネノ$#<>/{}=+*";
+  let W, H, drops = [], cols = 0, pts = [], mx = 0, my = 0, angY = 0, angX = 0.4;
+
+  // Matrix rain columns, each with its own depth (z) for a 3D feel.
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cols = Math.floor(W / 16);
+    drops = Array.from({ length: cols }, function () {
+      return { y: Math.random() * -H, z: 0.35 + Math.random() * 0.65 };
+    });
+  }
+
+  // Points spread evenly on a sphere (Fibonacci sphere).
+  for (let i = 0, n = 110; i < n; i++) {
+    const k = i + 0.5;
+    const phi = Math.acos(1 - 2 * k / n);
+    const th = Math.PI * (1 + Math.sqrt(5)) * k;
+    pts.push([Math.cos(th) * Math.sin(phi), Math.cos(phi), Math.sin(th) * Math.sin(phi)]);
+  }
+
+  addEventListener("resize", resize);
+  addEventListener("pointermove", function (e) {
+    mx = (e.clientX / W - 0.5) * 2;
+    my = (e.clientY / H - 0.5) * 2;
+  });
+  resize();
+
+  function rain() {
+    ctx.fillStyle = "rgba(7,17,31,0.16)";
+    ctx.fillRect(0, 0, W, H);
+    for (let i = 0; i < cols; i++) {
+      const d = drops[i];
+      const size = 8 + d.z * 8;
+      ctx.font = size + "px monospace";
+      const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
+      const x = i * 16;
+      ctx.fillStyle = "rgba(180,255,200," + (0.35 + d.z * 0.5) + ")";
+      ctx.fillText(ch, x, d.y);
+      ctx.fillStyle = "rgba(34,197,94," + (0.2 + d.z * 0.3) + ")";
+      ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, d.y - size);
+      d.y += size * 0.55 * d.z + 1.5;
+      if (d.y > H && Math.random() > 0.975) d.y = Math.random() * -80;
+    }
+  }
+
+  function globe() {
+    const R = Math.min(W, H) * 0.3;
+    const cx = W * 0.5, cy = H * 0.5, f = 3;
+    angY += 0.006 + mx * 0.01;
+    angX += (0.35 + my * 0.5 - angX) * 0.05;
+    const cY = Math.cos(angY), sY = Math.sin(angY);
+    const cX = Math.cos(angX), sX = Math.sin(angX);
+
+    const p = pts.map(function (v) {
+      let x = v[0] * cY - v[2] * sY;
+      let z = v[0] * sY + v[2] * cY;
+      let y = v[1] * cX - z * sX;
+      z = v[1] * sX + z * cX;
+      const s = f / (f + z);
+      return { x: cx + x * R * s, y: cy + y * R * s, z: z, s: s, x3: x, y3: y };
+    });
+
+    ctx.lineWidth = 1;
+    for (let i = 0; i < p.length; i++) {
+      for (let j = i + 1; j < p.length; j++) {
+        const dx = p[i].x3 - p[j].x3, dy = p[i].y3 - p[j].y3, dz = p[i].z - p[j].z;
+        if (dx * dx + dy * dy + dz * dz < 0.28) {
+          const a = 0.1 + (1 - (p[i].z + p[j].z + 2) / 4) * 0.35;
+          ctx.strokeStyle = "rgba(34,255,140," + a + ")";
+          ctx.beginPath(); ctx.moveTo(p[i].x, p[i].y); ctx.lineTo(p[j].x, p[j].y); ctx.stroke();
+        }
+      }
+    }
+    p.forEach(function (q) {
+      const a = 0.35 + (1 - (q.z + 1) / 2) * 0.65;
+      ctx.fillStyle = "rgba(120,255,190," + a + ")";
+      ctx.beginPath(); ctx.arc(q.x, q.y, 1 + q.s * 1.4, 0, 7); ctx.fill();
+    });
+
+    // rotating scan ring
+    ctx.strokeStyle = "rgba(0,217,255,0.35)";
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, R * 1.25, R * 1.25 * Math.abs(Math.sin(angY * 0.7)) * 0.4 + 6, angY, 0, 7);
+    ctx.stroke();
+  }
+
+  function frame() {
+    rain();
+    globe();
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  frame();
 })();
 </script>
 
