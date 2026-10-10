@@ -7,17 +7,19 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#07111f;color:#fff}
-#hackerBg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+body{margin:0;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:#07111f;color:#fff}
+#hackerBg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.38}
 header,nav,#authScreen,#appScreen,#publicScreen{position:relative;z-index:1}
 header{background:rgba(11,27,46,.85);padding:18px;text-align:center;border-bottom:2px solid #16a34a;box-shadow:0 0 20px #16a34a66}
 header h1{margin:0;color:#22c55e;font-size:24px;text-shadow:0 0 12px #22c55e;font-family:"Courier New",monospace;letter-spacing:2px}
 header p{margin:6px 0 0;color:#9ca3af;font-size:13px}
-nav{display:flex;gap:6px;overflow-x:auto;padding:10px;background:rgba(10,22,38,.85)}
-nav button{flex:0 0 auto;background:#12243a;color:#fff;border:1px solid #23415f;padding:10px 14px;border-radius:8px}
-nav button.active{background:#16a34a;border-color:#16a34a;box-shadow:0 0 12px #22c55e}
+nav{position:sticky;top:0;z-index:50;display:flex;gap:8px;overflow-x:auto;padding:10px;background:rgba(8,18,32,.92);backdrop-filter:blur(12px);border-bottom:1px solid #1b3550;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:0 0 auto;background:#10223a;color:#cbd5e1;border:1px solid #23415f;padding:10px 16px;border-radius:999px;transition:all .25s ease}
+nav button:active{transform:scale(.93)}
+nav button.active{background:linear-gradient(135deg,#16a34a,#0ea5a4);border-color:#22c55e;color:#fff;box-shadow:0 0 16px rgba(34,197,94,.55);transform:translateY(-1px)}
 .container{max-width:1000px;margin:auto;padding:16px}
-.card{background:rgba(13,29,49,.82);border:1px solid #203b57;border-radius:12px;padding:16px;margin-bottom:16px;backdrop-filter:blur(3px);box-shadow:0 0 18px rgba(34,197,94,.08)}
+.card{background:linear-gradient(160deg,rgba(15,33,56,.96),rgba(9,21,37,.97));border:1px solid #234563;border-radius:14px;padding:18px;margin-bottom:16px;backdrop-filter:blur(10px);box-shadow:0 8px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.04)}
 h2,h3{margin-top:0}
 input,select{width:100%;padding:12px;margin:7px 0;border-radius:8px;border:1px solid #31516e;background:#081525;color:#fff;font-size:15px}
 button{cursor:pointer;border:0;border-radius:8px;padding:11px 15px;background:#16a34a;color:white;font-weight:bold}
@@ -26,7 +28,7 @@ button.danger{background:#dc2626}
 button.gray{background:#475569}
 button.small{padding:7px 10px;font-size:12px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.stat{background:rgba(18,36,58,.85);padding:18px;border-radius:10px;text-align:center}
+.stat{background:linear-gradient(160deg,rgba(18,40,66,.97),rgba(10,24,42,.98));border:1px solid #234563;padding:18px;border-radius:14px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)}
 .stat strong{display:block;font-size:25px;color:#22c55e}
 .hidden{display:none!important}
 .muted{color:#94a3b8}
@@ -37,7 +39,7 @@ table{width:100%;border-collapse:collapse;margin-top:12px;min-width:600px}
 th,td{padding:10px;border-bottom:1px solid #263d54;text-align:center}
 th{background:#12243a;color:#22c55e}
 .table-wrap{overflow-x:auto}
-.team-row,.tournament-row,.match-row{background:rgba(18,36,58,.85);padding:12px;border-radius:9px;margin:8px 0}
+.team-row,.tournament-row,.match-row{background:rgba(18,36,58,.97);padding:12px;border-radius:9px;margin:8px 0}
 .fix-round{color:#22c55e;font-family:"Courier New",monospace;margin:16px 0 4px}
 .fix-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#14532d;color:#86efac;font-size:11px}
@@ -46,6 +48,62 @@ th{background:#12243a;color:#22c55e}
 .public-header{text-align:center;padding:25px 10px}
 .logo{font-size:30px;font-weight:bold;color:#22c55e}
 hr{border:0;border-top:1px solid #243b53;margin:18px 0}
+/* THEME V3: distinct colors and clear text */
+:root{--ac:#22c55e}
+body{background:#050b14;color:#f1f5f9}
+.muted{color:#b4c0d0}
+#dashboard{--ac:#22c55e}
+#tournaments{--ac:#f59e0b}
+#teams{--ac:#38bdf8}
+#fixtures{--ac:#a78bfa}
+#matches{--ac:#fb7185}
+#points{--ac:#2dd4bf}
+#navDashboard{--ac:#22c55e}
+#navTournaments{--ac:#f59e0b}
+#navTeams{--ac:#38bdf8}
+#navFixtures{--ac:#a78bfa}
+#navMatches{--ac:#fb7185}
+#navPoints{--ac:#2dd4bf}
+.card{background:#0f1c2e;backdrop-filter:none;border:1px solid #2a3f5c;border-top:3px solid var(--ac)}
+.card h2{color:#fff;font-size:21px;margin-bottom:12px}
+.card h3{color:var(--ac)}
+.stat{background:#0f1c2e;backdrop-filter:none;border:1px solid #2a3f5c;border-top:4px solid var(--st,#22c55e);color:#e2e8f0;font-size:16px}
+.stat strong{color:var(--st,#22c55e);font-size:36px}
+.stat:nth-child(1){--st:#22c55e}
+.stat:nth-child(2){--st:#38bdf8}
+.stat:nth-child(3){--st:#fbbf24}
+.team-row,.tournament-row,.match-row{background:#16263c;border:1px solid #2a3f5c;border-left:4px solid var(--ac)}
+input,select{background:#0a1626;border:1px solid #4a6a8f;color:#fff}
+input::placeholder{color:#8da2b8}
+label.muted{display:block;margin-top:6px;font-weight:bold}
+.section button:not(.secondary):not(.danger):not(.gray){background:var(--ac);color:#04121f}
+th{background:#16263c;color:var(--ac)}
+td{color:#f1f5f9}
+tbody tr:nth-child(even){background:rgba(255,255,255,.04)}
+nav button{color:#e2e8f0}
+nav button.active{background:var(--ac);border-color:var(--ac);color:#04121f;box-shadow:0 0 14px var(--ac)}
+.fix-round{color:var(--ac)}
+.badge{background:#14532d;color:#bbf7d0}
+.badge.done{background:#1e3a8a;color:#dbeafe}
+/* LOGIN LAYOUT */
+.auth-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 14px}
+.linkbtn{background:none;color:#38bdf8;padding:6px 0;font-weight:normal;text-decoration:underline}
+.btn-row{display:flex;gap:10px}
+.btn-row button{flex:1}
+/* PAGE TRANSITIONS */
+.section.enter{animation:secIn .6s cubic-bezier(.2,.8,.2,1) both}
+.section.enter>.card,.section.enter>.grid>.stat{animation:cardIn .7s cubic-bezier(.2,.8,.2,1) both}
+.section.enter>.card:nth-child(1){animation-delay:.05s}
+.section.enter>.card:nth-child(2){animation-delay:.2s}
+.section.enter>.grid>.stat:nth-child(1){animation-delay:.2s}
+.section.enter>.grid>.stat:nth-child(2){animation-delay:.3s}
+.section.enter>.grid>.stat:nth-child(3){animation-delay:.4s}
+@keyframes secIn{from{opacity:0;filter:blur(8px)}to{opacity:1;filter:blur(0)}}
+@keyframes cardIn{from{opacity:0;transform:translateY(34px) scale(.96)}to{opacity:1;transform:none}}
+#sweep{position:fixed;left:0;top:0;height:3px;width:100%;z-index:60;background:linear-gradient(90deg,transparent,#22c55e,#00d9ff,transparent);box-shadow:0 0 14px #22c55e;transform:translateX(-100%);opacity:0;pointer-events:none}
+#sweep.go{animation:sweep .8s ease-out}
+@keyframes sweep{0%{transform:translateX(-100%);opacity:1}100%{transform:translateX(100%);opacity:0}}
+@media(prefers-reduced-motion:reduce){.section.enter,.section.enter>*,.section.enter>.grid>.stat{animation:none!important}}
 /* REHAN'S TECHNOLOGY INTRO */
 #rehan-intro{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;background:radial-gradient(circle,#10364b,#061321 55%,#01040a);color:#e9fbff;transition:opacity .8s ease,visibility .8s ease}
 #rehan-intro.rehan-hide{opacity:0;visibility:hidden;pointer-events:none}
@@ -64,6 +122,7 @@ hr{border:0;border-top:1px solid #243b53;margin:18px 0}
 
 <!-- 3D HACKER BACKGROUND -->
 <canvas id="hackerBg"></canvas>
+<div id="sweep"></div>
 
 <!-- REHAN'S TECHNOLOGY INTRO -->
 <div id="rehan-intro">
@@ -88,18 +147,31 @@ hr{border:0;border-top:1px solid #243b53;margin:18px 0}
     <div id="loginBox">
       <h2>🔐 Organizer Login</h2>
       <p class="muted">Login to manage your tournaments.</p>
-      <input id="loginEmail" type="email" placeholder="Email">
-      <input id="loginPassword" type="password" placeholder="Password">
-      <button onclick="login()">Login</button>
-      <button class="gray" onclick="showRegister()">Create Admin Account</button>
+      <input id="loginEmail" type="email" placeholder="Email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <div class="auth-row">
+        <label class="muted" style="display:flex;gap:8px;align-items:center;font-weight:normal;margin:0">
+          <input type="checkbox" style="width:auto;margin:0" onchange="document.getElementById('loginPassword').type=this.checked?'text':'password'">
+          Show password
+        </label>
+        <button type="button" class="linkbtn" onclick="forgotPassword()">Forgot password?</button>
+      </div>
+      <div class="btn-row">
+        <button onclick="login()">Login</button>
+        <button class="gray" onclick="showRegister()">Create Admin Account</button>
+      </div>
       <p id="loginMsg"></p>
     </div>
 
     <div id="registerBox" class="hidden">
       <h2>📝 Create Account</h2>
       <p class="muted">Email can be your Gmail, but use a new RC24 password.</p>
-      <input id="regEmail" type="email" placeholder="Email">
-      <input id="regPassword" type="password" placeholder="New RC24 password">
+      <input id="regEmail" type="email" placeholder="Email" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <input id="regPassword" type="password" placeholder="New RC24 password (min 6 characters)" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <label class="muted" style="display:flex;gap:8px;align-items:center;font-weight:normal">
+        <input type="checkbox" style="width:auto;margin:0" onchange="document.getElementById('regPassword').type=this.checked?'text':'password'">
+        Show password
+      </label>
       <button onclick="register()">Create Account</button>
       <button class="gray" onclick="showLogin()">Back to Login</button>
       <p id="registerMsg"></p>
@@ -180,14 +252,14 @@ hr{border:0;border-top:1px solid #243b53;margin:18px 0}
     <select id="fixtureTournament" onchange="renderFixtures()">
       <option value="">Choose Tournament</option>
     </select>
-    <label class="muted">Type (League ke liye)</label>
+    <label class="muted">Type (for league)</label>
     <select id="fixtureMode">
-      <option value="single">Single Round Robin (har team 1 baar)</option>
-      <option value="double">Double Round Robin (har team 2 baar)</option>
+      <option value="single">Single Round Robin (each team plays once)</option>
+      <option value="double">Double Round Robin (each team plays twice)</option>
     </select>
     <button onclick="generateFixtures()">⚡ Generate Fixtures</button>
     <button class="danger" onclick="clearFixtures()">Clear Fixtures</button>
-    <p class="muted">Knockout tournament me Round 1 random pairing banegi (odd team ko BYE milega).</p>
+    <p class="muted">Knockout tournaments get a random Round 1 pairing (an odd team gets a BYE).</p>
     <p id="fixtureMsg"></p>
   </div>
   <div class="card">
@@ -299,7 +371,7 @@ hr{border:0;border-top:1px solid #243b53;margin:18px 0}
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 /* FIREBASE CONFIG */
@@ -319,6 +391,7 @@ const db = getFirestore(app);
 let currentUser = null;
 let tournaments = [];
 let publicTournament = null;
+const isPublicView = new URLSearchParams(location.search).has("t");
 
 /* HELPERS */
 function id(){
@@ -343,6 +416,12 @@ function firebaseError(error){
   if(error.code==="auth/invalid-email") return "Enter a valid email address.";
   if(error.code==="auth/weak-password") return "Password must be at least 6 characters.";
   if(error.code==="auth/invalid-credential") return "Email or password is incorrect.";
+  if(error.code==="auth/too-many-requests")
+    return "Too many attempts. Please wait 15-30 minutes and try again, or switch between Wi-Fi and mobile data. If you forgot your password, tap 'Forgot password?'.";
+  if(error.code==="auth/user-not-found")
+    return "No account found for this email. Please create an admin account first.";
+  if(error.code==="auth/network-request-failed")
+    return "Network problem. Please check your connection.";
   return error.message || "Something went wrong.";
 }
 
@@ -392,9 +471,25 @@ window.logout=async function(){
   await signOut(auth);
 };
 
+/* FORGOT PASSWORD */
+window.forgotPassword=async function(){
+  const email=document.getElementById("loginEmail").value.trim();
+  if(!email){
+    msg("loginMsg","Enter your email above first, then tap again.","error");
+    return;
+  }
+  try{
+    await sendPasswordResetEmail(auth,email);
+    msg("loginMsg","Reset email sent. Check your inbox and spam folder.","success");
+  }catch(error){
+    msg("loginMsg",firebaseError(error),"error");
+  }
+};
+
 /* AUTH STATE */
 onAuthStateChanged(auth, async user=>{
   currentUser=user;
+  if(isPublicView)return; // do not show login/app screens on the public page
   if(user){
     document.getElementById("authScreen").classList.add("hidden");
     document.getElementById("appScreen").classList.remove("hidden");
@@ -513,7 +608,7 @@ window.addTeam=async function(){
   try{
     await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams});
     document.getElementById("teamName").value="";
-    msg("teamMsg","Team added successfully! (Teams badalne par fixtures dobara generate karein)");
+    msg("teamMsg","Team added successfully! (Regenerate fixtures if you change teams.)");
     await loadTournaments();
   }catch(error){
     msg("teamMsg",error.message,"error");
@@ -522,11 +617,13 @@ window.addTeam=async function(){
 
 /* DELETE TEAM */
 window.deleteTeam=async function(tournamentId,teamId){
+  if(!confirm("Deleting this team will also delete its matches and fixtures. Continue?"))return;
   const t=tournaments.find(x=>x.id===tournamentId);
   if(!t)return;
   const teams=(t.teams || []).filter(x=>x.id!==teamId);
   const fixtures=(t.fixtures || []).filter(f=>f.a!==teamId && f.b!==teamId);
-  await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams,fixtures:fixtures});
+  const matches=(t.matches || []).filter(m=>m.a!==teamId && m.b!==teamId);
+  await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams,fixtures:fixtures,matches:matches});
   await loadTournaments();
 };
 
@@ -571,7 +668,7 @@ window.generateFixtures=async function(){
   const mode=document.getElementById("fixtureMode").value;
 
   if(!tournamentId){
-    msg("fixtureMsg","Pehle tournament choose karein.","error");
+    msg("fixtureMsg","Please choose a tournament first.","error");
     return;
   }
 
@@ -581,12 +678,12 @@ window.generateFixtures=async function(){
   const teamIds=(t.teams || []).map(x=>x.id);
 
   if(teamIds.length<2){
-    msg("fixtureMsg","Fixtures ke liye kam az kam 2 teams chahiye.","error");
+    msg("fixtureMsg","At least 2 teams are needed to generate fixtures.","error");
     return;
   }
 
   if((t.fixtures || []).length &&
-     !confirm("Purane fixtures delete ho kar naye ban jayenge. Continue?"))return;
+     !confirm("Existing fixtures will be replaced with new ones. Continue?"))return;
 
   const fixtures=[];
 
@@ -635,7 +732,7 @@ window.generateFixtures=async function(){
 
   try{
     await updateDoc(doc(db,"tournaments",tournamentId),{fixtures:fixtures});
-    msg("fixtureMsg",fixtures.length+" fixtures generate ho gaye!");
+    msg("fixtureMsg",fixtures.length+" fixtures generated!");
     await loadTournaments();
   }catch(error){
     msg("fixtureMsg",error.message,"error");
@@ -645,12 +742,12 @@ window.generateFixtures=async function(){
 window.clearFixtures=async function(){
   const tournamentId=document.getElementById("fixtureTournament").value;
   if(!tournamentId){
-    msg("fixtureMsg","Pehle tournament choose karein.","error");
+    msg("fixtureMsg","Please choose a tournament first.","error");
     return;
   }
-  if(!confirm("Saare fixtures delete karne hain?"))return;
+  if(!confirm("Delete all fixtures?"))return;
   await updateDoc(doc(db,"tournaments",tournamentId),{fixtures:[]});
-  msg("fixtureMsg","Fixtures clear ho gaye.");
+  msg("fixtureMsg","Fixtures cleared.");
   await loadTournaments();
 };
 
@@ -707,10 +804,20 @@ window.renderFixtures=function(){
   const tournamentId=document.getElementById("fixtureTournament").value;
   const box=document.getElementById("fixtureList");
   const t=tournaments.find(x=>x.id===tournamentId);
-  box.innerHTML=t ? fixturesHTML(t,true) : '<p class="muted">Tournament choose karein.</p>';
+  box.innerHTML=t ? fixturesHTML(t,true) : '<p class="muted">Choose a tournament.</p>';
 };
 
 /* ADD MATCH */
+function validateInnings(t,runs,wkts,overs,label){
+  if(runs<0 || !Number.isInteger(runs))return label+": enter valid runs.";
+  if(wkts<0 || wkts>10 || !Number.isInteger(wkts))return label+": wickets must be between 0 and 10.";
+  if(!(overs>0))return label+": enter overs (required for NRR).";
+  const balls=Math.round((overs-Math.floor(overs))*10);
+  if(balls>5)return label+": invalid overs (use 9.5, then 10.0; 9.6 does not exist).";
+  if(oversToBalls(overs)>oversToBalls(t.overs))return label+": overs cannot exceed "+t.overs+".";
+  return "";
+}
+
 window.addMatch=async function(){
   const tournamentId=document.getElementById("matchTournament").value;
   const a=document.getElementById("matchTeamA").value;
@@ -738,6 +845,18 @@ window.addMatch=async function(){
 
   const t=tournaments.find(x=>x.id===tournamentId);
   if(!t)return;
+
+  if(type!=="noresult"){
+    const bad=validateInnings(t,ra,wa,oa,"Team A") || validateInnings(t,rb,wb,ob,"Team B");
+    if(bad){
+      msg("matchMsg",bad,"error");
+      return;
+    }
+    if(type==="tie" && ra!==rb){
+      msg("matchMsg","For a tie, both teams must have equal runs.","error");
+      return;
+    }
+  }
 
   const matches=[...(t.matches || [])];
   const matchId=id();
@@ -783,6 +902,25 @@ window.deleteMatch=async function(tournamentId,matchId){
   await loadTournaments();
 };
 
+/* TITLE DECODE EFFECT */
+function scramble(el){
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const final=el.dataset.final || (el.dataset.final=el.textContent);
+  const chars="01#$<>/{}=+*ABCDEF";
+  clearInterval(el._iv);
+  let step=0;
+  el._iv=setInterval(()=>{
+    el.textContent=[...final].map((c,i)=>
+      (i<step || c===" " || c.charCodeAt(0)>127) ? c : chars[Math.floor(Math.random()*chars.length)]
+    ).join("");
+    step+=0.7;
+    if(step>=final.length){
+      clearInterval(el._iv);
+      el.textContent=final;
+    }
+  },35);
+}
+
 /* NAVIGATION */
 window.showSection=function(section){
   document.querySelectorAll(".section").forEach(x=>x.classList.add("hidden"));
@@ -791,9 +929,28 @@ window.showSection=function(section){
 
   document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
   const nav=document.getElementById("nav"+section.charAt(0).toUpperCase()+section.slice(1));
-  if(nav)nav.classList.add("active");
+  if(nav){
+    nav.classList.add("active");
+    nav.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
+  }
 
   renderAll();
+
+  if(target){
+    target.classList.remove("enter");
+    void target.offsetWidth;
+    target.classList.add("enter");
+
+    const sw=document.getElementById("sweep");
+    sw.classList.remove("go");
+    void sw.offsetWidth;
+    sw.classList.add("go");
+
+    window.scrollTo({top:0,behavior:"smooth"});
+
+    const h=target.querySelector("h2");
+    if(h)scramble(h);
+  }
 };
 
 /* TOURNAMENT DROPDOWNS */
@@ -940,6 +1097,7 @@ function calculatePoints(t){
     })
     .sort((a,b)=>{
       if(b.pts!==a.pts)return b.pts-a.pts;
+      if(b.w!==a.w)return b.w-a.w;
       return b.nrr-a.nrr;
     });
 }
@@ -1066,6 +1224,24 @@ function renderTeams(){
   });
 }
 
+/* MATCH DISPLAY */
+function matchHTML(t,m){
+  const nameA=(t.teams || []).find(x=>x.id===m.a)?.name || "Team A";
+  const nameB=(t.teams || []).find(x=>x.id===m.b)?.name || "Team B";
+  const sc=(r,w,o)=>m.type==="noresult" ? "-" : `${r}/${w || 0} (${o} ov)`;
+
+  let result="No result";
+  if(m.type==="tie" || (m.type!=="noresult" && m.ra===m.rb))result="Match tied";
+  else if(m.type!=="noresult")result=(m.ra>m.rb ? nameA : nameB)+" won";
+
+  return `
+    <p>
+      <strong>${esc(nameA)}</strong> ${sc(m.ra,m.wa,m.oa)}<br>
+      <strong>${esc(nameB)}</strong> ${sc(m.rb,m.wb,m.ob)}
+    </p>
+    <p class="success">${esc(result)}</p>`;
+}
+
 /* RENDER MATCHES */
 function renderMatches(){
   const box=document.getElementById("matchList");
@@ -1079,16 +1255,10 @@ function renderMatches(){
       const div=document.createElement("div");
       div.className="match-row";
 
-      div.innerHTML=`
-        <strong>${esc(t.name)}</strong>
-        <p>
-          ${esc(teamA?.name || "Team A")}
-          <strong>${m.ra}</strong> - <strong>${m.rb}</strong>
-          ${esc(teamB?.name || "Team B")}
-        </p>
-        <p class="muted">Overs: ${m.oa} - ${m.ob}</p>
-        <button class="danger small" onclick="deleteMatch('${t.id}','${m.id}')">Delete</button>
-      `;
+      div.innerHTML=
+        `<strong>${esc(t.name)}</strong>`+
+        matchHTML(t,m)+
+        `<button class="danger small" onclick="deleteMatch('${t.id}','${m.id}')">Delete</button>`;
 
       box.appendChild(div);
     });
@@ -1161,12 +1331,7 @@ function renderPublic(t){
 
     const div=document.createElement("div");
     div.className="match-row";
-    div.innerHTML=`
-      <strong>
-        ${esc(A?.name || "Team A")} ${m.ra} - ${m.rb} ${esc(B?.name || "Team B")}
-      </strong>
-      <p class="muted">Overs: ${m.oa} - ${m.ob}</p>
-    `;
+    div.innerHTML=matchHTML(t,m);
     matchesBox.appendChild(div);
   });
 
@@ -1185,7 +1350,7 @@ window.createOwnTournament=function(){
 };
 
 /* START */
-if(new URLSearchParams(location.search).has("t")){
+if(isPublicView){
   loadPublicTournament();
 }
 
@@ -1265,7 +1430,7 @@ if(new URLSearchParams(location.search).has("t")){
   }
 
   function globe() {
-    const R = Math.min(W, H) * 0.3;
+    const R = Math.min(W, H) * 0.26;
     const cx = W * 0.5, cy = H * 0.5, f = 3;
     angY += 0.006 + mx * 0.01;
     angX += (0.35 + my * 0.5 - angX) * 0.05;
