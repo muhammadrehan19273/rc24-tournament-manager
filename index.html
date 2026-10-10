@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RC24 Tournament Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 *{box-sizing:border-box}
@@ -11,7 +14,7 @@ body{margin:0;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;backg
 #hackerBg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.38}
 header,nav,#authScreen,#appScreen,#publicScreen{position:relative;z-index:1}
 header{background:rgba(11,27,46,.85);padding:18px;text-align:center;border-bottom:2px solid #16a34a;box-shadow:0 0 20px #16a34a66}
-header h1{margin:0;color:#22c55e;font-size:24px;text-shadow:0 0 12px #22c55e;font-family:"Courier New",monospace;letter-spacing:2px}
+header h1{margin:0;color:#22c55e;font-size:24px;text-shadow:0 0 12px #22c55e;letter-spacing:2px}
 header p{margin:6px 0 0;color:#9ca3af;font-size:13px}
 nav{position:sticky;top:0;z-index:50;display:flex;gap:8px;overflow-x:auto;padding:10px;background:rgba(8,18,32,.92);backdrop-filter:blur(12px);border-bottom:1px solid #1b3550;scrollbar-width:none}
 nav::-webkit-scrollbar{display:none}
@@ -40,7 +43,7 @@ th,td{padding:10px;border-bottom:1px solid #263d54;text-align:center}
 th{background:#12243a;color:#22c55e}
 .table-wrap{overflow-x:auto}
 .team-row,.tournament-row,.match-row{background:rgba(18,36,58,.97);padding:12px;border-radius:9px;margin:8px 0}
-.fix-round{color:#22c55e;font-family:"Courier New",monospace;margin:16px 0 4px}
+.fix-round{color:#22c55e;margin:16px 0 4px}
 .fix-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .badge{display:inline-block;padding:4px 8px;border-radius:20px;background:#14532d;color:#86efac;font-size:11px}
 .badge.done{background:#1e3a8a;color:#bfdbfe}
@@ -90,6 +93,45 @@ nav button.active{background:var(--ac);border-color:var(--ac);color:#04121f;box-
 .linkbtn{background:none;color:#38bdf8;padding:6px 0;font-weight:normal;text-decoration:underline}
 .btn-row{display:flex;gap:10px}
 .btn-row button{flex:1}
+/* MOBILE FRIENDLY */
+input:not([type=checkbox]),select{font-size:16px;min-height:46px}
+input[type=checkbox]{height:22px;min-width:22px}
+button{min-height:44px}
+button.small{min-height:38px;padding:8px 12px}
+.tournament-row button{margin:4px 6px 4px 0}
+@media(max-width:600px){
+  .container{padding:12px}
+  .card{padding:14px}
+  .card h2{font-size:19px}
+  header h1{font-size:20px;letter-spacing:1px}
+  table{min-width:0;font-size:14px}
+  th,td{padding:8px 4px}
+  th:first-child,td:first-child{text-align:left;padding-left:8px}
+  .fix-row{flex-direction:column;align-items:flex-start}
+}
+/* BUTTON STYLE: gradient, slimmer, gradient outline glow on click */
+button{position:relative;padding:6px 20px;min-height:32px;line-height:1.2;background:linear-gradient(135deg,#22c55e,#0d9488);transition:transform .15s ease,box-shadow .7s ease}
+button.secondary{background:linear-gradient(135deg,#3b82f6,#6366f1)}
+button.danger{background:linear-gradient(135deg,#ef4444,#be123c)}
+button.gray{background:linear-gradient(135deg,#64748b,#334155)}
+button.small{padding:4px 12px;min-height:28px}
+.section button:not(.secondary):not(.danger):not(.gray){background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 55%,#38bdf8))}
+nav button{padding:5px 18px;min-height:32px;background:linear-gradient(135deg,#13294a,#0d1b30)}
+nav button.active{background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 55%,#38bdf8))}
+button::before{content:"";position:absolute;inset:-4px;border-radius:inherit;padding:3px;background:linear-gradient(135deg,var(--ac),#38bdf8,#a78bfa);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:0;transform:scale(.88);transition:opacity .7s ease,transform .7s ease;pointer-events:none}
+button:active{transform:scale(.95);box-shadow:0 0 0 1px var(--ac),0 0 14px 2px var(--ac),0 0 28px 6px rgba(56,189,248,.45);transition:transform .08s,box-shadow .05s}
+button:active::before{opacity:1;transform:scale(1);transition:none}
+.linkbtn{background:none;box-shadow:none;min-height:0;padding:6px 0}
+.linkbtn::before{display:none}
+.linkbtn:active{transform:none;box-shadow:none}
+/* TYPOGRAPHY & FOCUS: same font family and size everywhere */
+body{font-family:'Poppins',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:16px;line-height:1.5}
+button,input,select,textarea{font-family:inherit}
+button,input:not([type=checkbox]),select{font-size:16px}
+button.small,.linkbtn{font-size:14px}
+table{font-size:14px}
+input:not([type=checkbox]),select{transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
+input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;box-shadow:0 0 0 3px rgba(34,197,94,.28),0 0 18px rgba(56,189,248,.35)}
 /* PAGE TRANSITIONS */
 .section.enter{animation:secIn .6s cubic-bezier(.2,.8,.2,1) both}
 .section.enter>.card,.section.enter>.grid>.stat{animation:cardIn .7s cubic-bezier(.2,.8,.2,1) both}
@@ -429,10 +471,12 @@ function firebaseError(error){
 window.showRegister=function(){
   document.getElementById("loginBox").classList.add("hidden");
   document.getElementById("registerBox").classList.remove("hidden");
+  document.getElementById("regEmail").focus();
 };
 window.showLogin=function(){
   document.getElementById("registerBox").classList.add("hidden");
   document.getElementById("loginBox").classList.remove("hidden");
+  document.getElementById("loginEmail").focus();
 };
 
 /* REGISTER */
@@ -1368,9 +1412,13 @@ if(isPublicView){
     if (closed) return;
     closed = true;
     intro.classList.add("rehan-hide");
+    // focus the email field once the intro closes (desktop only, so the phone keyboard does not pop up by itself)
+    const em = document.getElementById("loginEmail");
+    if (em && !em.closest(".hidden") && window.matchMedia("(pointer: fine)").matches) em.focus();
     window.setTimeout(function () { intro.remove(); }, 850);
   }
   skip.addEventListener("click", closeIntro);
+  document.addEventListener("touchstart", function () {}, { passive: true }); // enables :active on iOS
   window.setTimeout(closeIntro, 3500);
 })();
 </script>
