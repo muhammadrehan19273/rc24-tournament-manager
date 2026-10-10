@@ -132,6 +132,7 @@ button.small,.linkbtn{font-size:14px}
 table{font-size:14px}
 input:not([type=checkbox]),select{transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
 input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;box-shadow:0 0 0 3px rgba(34,197,94,.28),0 0 18px rgba(56,189,248,.35)}
+.qual td:first-child{border-left:3px solid #22c55e}
 /* PAGE TRANSITIONS */
 .section.enter{animation:secIn .6s cubic-bezier(.2,.8,.2,1) both}
 .section.enter>.card,.section.enter>.grid>.stat{animation:cardIn .7s cubic-bezier(.2,.8,.2,1) both}
@@ -255,12 +256,20 @@ input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;bo
   <div class="card">
     <h2>🏆 Create Tournament</h2>
     <input id="tournamentName" placeholder="Tournament name">
-    <select id="tournamentFormat">
+    <select id="tournamentFormat" onchange="toggleGroupOptions()">
       <option value="League">League</option>
       <option value="Knockout">Knockout</option>
       <option value="League + Knockout">League + Knockout</option>
     </select>
     <input id="tournamentOvers" type="number" min="1" value="10" placeholder="Overs">
+    <div id="groupOptions">
+      <label class="muted">Number of groups (1 = no groups, up to 26)</label>
+      <input id="tournamentGroups" type="number" min="1" max="26" value="1" placeholder="Number of groups">
+      <div id="qualifyBox" class="hidden">
+        <label class="muted">Teams moving to the knockout from each group (any number)</label>
+        <input id="tournamentQualify" type="number" min="1" max="64" value="2" placeholder="Teams qualifying per group">
+      </div>
+    </div>
     <button onclick="createTournament()">Create Tournament</button>
     <p id="tournamentMsg"></p>
   </div>
@@ -275,9 +284,11 @@ input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;bo
   <div class="card">
     <h2>👥 Add Team</h2>
     <label class="muted">Choose Tournament</label>
-    <select id="teamTournament"><option value="">Choose Tournament</option></select>
+    <select id="teamTournament" onchange="updateTeamGroupSelect()"><option value="">Choose Tournament</option></select>
+    <select id="teamGroup" class="hidden"></select>
     <input id="teamName" placeholder="Team name">
     <button onclick="addTeam()">Add Team</button>
+    <button id="teamDrawBtn" class="secondary hidden" onclick="drawGroups()">🎲 Draw groups randomly</button>
     <p id="teamMsg"></p>
   </div>
   <div class="card">
@@ -300,8 +311,9 @@ input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;bo
       <option value="double">Double Round Robin (each team plays twice)</option>
     </select>
     <button onclick="generateFixtures()">⚡ Generate Fixtures</button>
+    <button class="secondary" onclick="generateKnockout()">🏆 Generate Knockout</button>
     <button class="danger" onclick="clearFixtures()">Clear Fixtures</button>
-    <p class="muted">Knockout tournaments get a random Round 1 pairing (an odd team gets a BYE).</p>
+    <p class="muted">Fixtures: round robin inside each group. Knockout: top teams of each group are seeded so group winners meet runners-up, and winners move on automatically after you score each tie.</p>
     <p id="fixtureMsg"></p>
   </div>
   <div class="card">
@@ -336,6 +348,12 @@ input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;bo
       <option value="tie">Tie</option>
       <option value="noresult">No Result</option>
     </select>
+    <label class="muted">If runs are level in a knockout match, winner:</label>
+    <select id="matchTieWinner">
+      <option value="">Not needed</option>
+      <option value="a">Team A</option>
+      <option value="b">Team B</option>
+    </select>
     <button onclick="addMatch()">Save Match</button>
     <p id="matchMsg"></p>
   </div>
@@ -352,14 +370,7 @@ input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;bo
     <select id="pointsTournament" onchange="renderPoints()">
       <option value="">Choose Tournament</option>
     </select>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Team</th><th>P</th><th>W</th><th>L</th><th>T</th><th>NR</th><th>Pts</th><th>NRR</th></tr>
-        </thead>
-        <tbody id="pointsBody"></tbody>
-      </table>
-    </div>
+    <div id="pointsWrap"></div>
   </div>
 </section>
 
@@ -387,20 +398,18 @@ input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;bo
     </div>
 
     <div class="card">
+      <h2>🏆 Knockout</h2>
+      <div id="publicKnockout"></div>
+    </div>
+
+    <div class="card">
       <h2>🏏 Matches</h2>
       <div id="publicMatches"></div>
     </div>
 
     <div class="card">
       <h2>📊 Points Table</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Team</th><th>P</th><th>W</th><th>L</th><th>T</th><th>NR</th><th>Pts</th><th>NRR</th></tr>
-          </thead>
-          <tbody id="publicPointsBody"></tbody>
-        </table>
-      </div>
+      <div id="publicPoints"></div>
     </div>
 
     <div class="card" style="text-align:center">
@@ -434,6 +443,7 @@ let currentUser = null;
 let tournaments = [];
 let publicTournament = null;
 const isPublicView = new URLSearchParams(location.search).has("t");
+let pendingKo = null;
 
 /* HELPERS */
 function id(){
@@ -564,6 +574,8 @@ window.createTournament=async function(){
   const name=document.getElementById("tournamentName").value.trim();
   const format=document.getElementById("tournamentFormat").value;
   const overs=Number(document.getElementById("tournamentOvers").value);
+  const groups=Math.min(26,Math.max(1,Math.floor(Number(document.getElementById("tournamentGroups").value)) || 1));
+  const qualify=Math.min(64,Math.max(1,Math.floor(Number(document.getElementById("tournamentQualify").value)) || 2));
 
   if(!name){
     msg("tournamentMsg","Enter tournament name.","error");
@@ -578,6 +590,8 @@ window.createTournament=async function(){
     name:name,
     format:format,
     overs:overs || 10,
+    groups:format==="Knockout" ? 1 : groups,
+    qualify:qualify,
     published:false,
     createdAt:Date.now(),
     teams:[],
@@ -647,7 +661,17 @@ window.addTeam=async function(){
     return;
   }
 
-  teams.push({id:id(),name:name});
+  const gs=groupList(t);
+  let group="";
+  if(gs.length>1){
+    group=document.getElementById("teamGroup").value;
+    if(!group){
+      const counts=gs.map(g=>teams.filter(x=>(x.group || "")===g).length);
+      group=gs[counts.indexOf(Math.min(...counts))];
+    }
+  }
+
+  teams.push({id:id(),name:name,group:group});
 
   try{
     await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams});
@@ -667,7 +691,7 @@ window.deleteTeam=async function(tournamentId,teamId){
   const teams=(t.teams || []).filter(x=>x.id!==teamId);
   const fixtures=(t.fixtures || []).filter(f=>f.a!==teamId && f.b!==teamId);
   const matches=(t.matches || []).filter(m=>m.a!==teamId && m.b!==teamId);
-  await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams,fixtures:fixtures,matches:matches});
+  await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams,fixtures:fixtures,matches:matches,ko:null});
   await loadTournaments();
 };
 
@@ -719,40 +743,32 @@ window.generateFixtures=async function(){
   const t=tournaments.find(x=>x.id===tournamentId);
   if(!t)return;
 
-  const teamIds=(t.teams || []).map(x=>x.id);
-
-  if(teamIds.length<2){
-    msg("fixtureMsg","At least 2 teams are needed to generate fixtures.","error");
-    return;
+  // Pure knockout tournaments go straight to the bracket.
+  if(t.format==="Knockout"){
+    return window.generateKnockout();
   }
-
-  if((t.fixtures || []).length &&
-     !confirm("Existing fixtures will be replaced with new ones. Continue?"))return;
 
   const fixtures=[];
 
-  if(t.format==="Knockout"){
-    const order=shuffle(teamIds);
-    for(let i=0;i<order.length;i+=2){
-      fixtures.push({
-        id:id(),
-        round:"Round 1",
-        a:order[i],
-        b:order[i+1] || "BYE",
-        matchId:""
-      });
+  for(const g of groupList(t)){
+    const ids=(t.teams || []).filter(x=>(x.group || "")===g).map(x=>x.id);
+
+    if(ids.length<2){
+      msg("fixtureMsg",(g ? "Group "+g : "The tournament")+" needs at least 2 teams.","error");
+      return;
     }
-  }else{
-    let rounds=roundRobin(shuffle(teamIds));
+
+    let rounds=roundRobin(shuffle(ids));
     if(mode==="double"){
-      const second=rounds.map(r=>r.map(p=>[p[1],p[0]]));
-      rounds=rounds.concat(second);
+      rounds=rounds.concat(rounds.map(r=>r.map(p=>[p[1],p[0]])));
     }
+
     rounds.forEach((pairs,index)=>{
       pairs.forEach(p=>{
         fixtures.push({
           id:id(),
-          round:"Round "+(index+1),
+          round:(g ? "Group "+g+" - " : "")+"Round "+(index+1),
+          group:g,
           a:p[0],
           b:p[1],
           matchId:""
@@ -761,9 +777,12 @@ window.generateFixtures=async function(){
     });
   }
 
-  // Link already-played matches so they show as completed.
+  if((t.fixtures || []).length &&
+     !confirm("Existing fixtures will be replaced with new ones. Continue?"))return;
+
+  // Link already-played group matches so they show as completed.
   const used=new Set();
-  (t.matches || []).forEach(m=>{
+  (t.matches || []).filter(m=>m.stage!=="ko").forEach(m=>{
     const f=fixtures.find(x=>
       !x.matchId &&
       ((x.a===m.a && x.b===m.b) || (x.a===m.b && x.b===m.a))
@@ -789,8 +808,8 @@ window.clearFixtures=async function(){
     msg("fixtureMsg","Please choose a tournament first.","error");
     return;
   }
-  if(!confirm("Delete all fixtures?"))return;
-  await updateDoc(doc(db,"tournaments",tournamentId),{fixtures:[]});
+  if(!confirm("Delete all fixtures and the knockout bracket?"))return;
+  await updateDoc(doc(db,"tournaments",tournamentId),{fixtures:[],ko:null});
   msg("fixtureMsg","Fixtures cleared.");
   await loadTournaments();
 };
@@ -848,8 +867,257 @@ window.renderFixtures=function(){
   const tournamentId=document.getElementById("fixtureTournament").value;
   const box=document.getElementById("fixtureList");
   const t=tournaments.find(x=>x.id===tournamentId);
-  box.innerHTML=t ? fixturesHTML(t,true) : '<p class="muted">Choose a tournament.</p>';
+  box.innerHTML=t ? fixturesHTML(t,true)+koHTML(t,true) : '<p class="muted">Choose a tournament.</p>';
 };
+
+/* =========================
+   GROUPS & KNOCKOUT
+========================= */
+
+function groupList(t){
+  const n=Number(t.groups) || 1;
+  return (n>1 && t.format!=="Knockout") ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ".slice(0,Math.min(n,26)).split("") : [""];
+}
+
+window.toggleGroupOptions=function(){
+  const f=document.getElementById("tournamentFormat").value;
+  document.getElementById("groupOptions").classList.toggle("hidden",f==="Knockout");
+  document.getElementById("qualifyBox").classList.toggle("hidden",f==="League");
+};
+
+window.updateTeamGroupSelect=function(){
+  const sel=document.getElementById("teamGroup");
+  const btn=document.getElementById("teamDrawBtn");
+  if(!sel || !btn)return;
+
+  const t=tournaments.find(x=>x.id===document.getElementById("teamTournament").value);
+  const gs=t ? groupList(t) : [""];
+  const grouped=gs.length>1;
+
+  sel.classList.toggle("hidden",!grouped);
+  btn.classList.toggle("hidden",!grouped);
+
+  const old=sel.value;
+  sel.innerHTML='<option value="">Group: automatic (smallest group)</option>'+
+    gs.filter(g=>g).map(g=>'<option value="'+g+'">Group '+g+'</option>').join("");
+  if(gs.includes(old))sel.value=old;
+};
+
+window.drawGroups=async function(){
+  const tournamentId=document.getElementById("teamTournament").value;
+  const t=tournaments.find(x=>x.id===tournamentId);
+
+  if(!t){
+    msg("teamMsg","Please choose a tournament first.","error");
+    return;
+  }
+
+  const gs=groupList(t);
+
+  if(gs.length<2 || !(t.teams || []).length){
+    msg("teamMsg","Add teams to a tournament that has groups first.","error");
+    return;
+  }
+
+  if(((t.fixtures || []).length || (t.ko && t.ko.rounds)) &&
+     !confirm("Drawing groups again will delete the existing fixtures and knockout. Continue?"))return;
+
+  const teams=shuffle(t.teams).map((x,i)=>({...x,group:gs[i%gs.length]}));
+
+  try{
+    await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams,fixtures:[],ko:null});
+    msg("teamMsg","Groups drawn! Now generate the fixtures.");
+    await loadTournaments();
+  }catch(error){
+    msg("teamMsg",error.message,"error");
+  }
+};
+
+// Standard bracket order: seed 1 and 2 can only meet in the final.
+function bracketOrder(size){
+  let order=[1];
+  while(order.length<size){
+    const len=order.length*2;
+    order=order.flatMap(x=>[x,len+1-x]);
+  }
+  return order;
+}
+
+// Moves winners into the next round and resets anything that is no longer valid.
+function propagateKo(ko){
+  ko.rounds.forEach((r,ri)=>{
+    r.ties.forEach(x=>{
+      if(ri===0){
+        if(x.a && !x.b)x.w=x.a;
+        else if(x.b && !x.a)x.w=x.b;
+      }
+      if(x.w && x.w!==x.a && x.w!==x.b){
+        x.w="";
+        x.matchId="";
+      }
+    });
+
+    const next=ko.rounds[ri+1];
+    if(next){
+      r.ties.forEach((x,i)=>{
+        const nt=next.ties[Math.floor(i/2)];
+        if(i%2===0)nt.a=x.w || null;
+        else nt.b=x.w || null;
+      });
+    }
+  });
+}
+
+function koRoundName(i,total){
+  const rem=total-i;
+  if(rem===1)return "Final";
+  if(rem===2)return "Semi-finals";
+  if(rem===3)return "Quarter-finals";
+  return "Round of "+Math.pow(2,rem);
+}
+
+window.generateKnockout=async function(){
+  const tournamentId=document.getElementById("fixtureTournament").value;
+  const t=tournaments.find(x=>x.id===tournamentId);
+
+  if(!t){
+    msg("fixtureMsg","Please choose a tournament first.","error");
+    return;
+  }
+
+  if(t.format==="League"){
+    msg("fixtureMsg","This is a League tournament. Create it as League + Knockout to use a knockout stage.","error");
+    return;
+  }
+
+  let seeds=[];
+
+  if(t.format==="Knockout"){
+    seeds=shuffle((t.teams || []).map(x=>x.id));
+  }else{
+    const q=Number(t.qualify) || 2;
+    const pending=(t.fixtures || []).filter(f=>!f.matchId).length;
+
+    if(pending &&
+       !confirm(pending+" group matches are not played yet. Build the knockout from the current tables anyway?"))return;
+
+    // Seeds: all group winners first, then all runners-up, and so on.
+    const lists=groupList(t).map(g=>calculatePoints(t,g).slice(0,q).map(r=>r.id));
+    for(let r=0;r<q;r++){
+      lists.forEach(l=>{
+        if(l[r])seeds.push(l[r]);
+      });
+    }
+  }
+
+  if(seeds.length<2){
+    msg("fixtureMsg","Not enough teams to build a knockout.","error");
+    return;
+  }
+
+  if(t.ko && t.ko.rounds && !confirm("The existing knockout will be replaced. Continue?"))return;
+
+  const size=Math.pow(2,Math.ceil(Math.log2(seeds.length)));
+  const slots=bracketOrder(size).map(sd=>seeds[sd-1] || null);
+
+  const first=[];
+  for(let i=0;i<size;i+=2){
+    first.push({id:id(),a:slots[i],b:slots[i+1],matchId:"",w:""});
+  }
+
+  const rounds=[{ties:first}];
+  let n=first.length;
+  while(n>1){
+    n=n/2;
+    rounds.push({ties:Array.from({length:n},()=>({id:id(),a:null,b:null,matchId:"",w:""}))});
+  }
+
+  const ko={rounds:rounds};
+  propagateKo(ko);
+
+  try{
+    await updateDoc(doc(db,"tournaments",tournamentId),{ko:ko});
+    msg("fixtureMsg","Knockout created with "+seeds.length+" teams!");
+    await loadTournaments();
+  }catch(error){
+    msg("fixtureMsg",error.message,"error");
+  }
+};
+
+window.scoreKo=function(tournamentId,tieId){
+  const t=tournaments.find(x=>x.id===tournamentId);
+  if(!t || !t.ko)return;
+
+  let tie=null;
+  t.ko.rounds.forEach(r=>r.ties.forEach(x=>{
+    if(x.id===tieId)tie=x;
+  }));
+  if(!tie)return;
+
+  pendingKo={tid:tournamentId,tieId:tieId};
+
+  showSection("matches");
+  document.getElementById("matchTournament").value=tournamentId;
+  loadMatchTeams();
+  document.getElementById("matchTeamA").value=tie.a;
+  document.getElementById("matchTeamB").value=tie.b;
+};
+
+function koHTML(t,admin){
+  const ko=t.ko;
+  if(!ko || !ko.rounds || !ko.rounds.length)return "";
+
+  const nm=tid=>tid ? ((t.teams || []).find(x=>x.id===tid)?.name || "?") : "TBD";
+  let html=admin ? '<h2 style="margin-top:22px">🏆 Knockout</h2>' : "";
+
+  ko.rounds.forEach((r,ri)=>{
+    html+='<h3 class="fix-round">&gt; '+esc(koRoundName(ri,ko.rounds.length))+'</h3>';
+
+    r.ties.forEach(x=>{
+      const bye=(ri===0 && (!x.a || !x.b));
+      const ready=!!(x.a && x.b && !x.w);
+      const A=(ri===0 && !x.a) ? "BYE" : nm(x.a);
+      const B=(ri===0 && !x.b) ? "BYE" : nm(x.b);
+
+      let badge='<span class="badge">WAITING</span>';
+      if(bye)badge='<span class="badge">BYE</span>';
+      else if(x.w)badge='<span class="badge done">WINNER: '+esc(nm(x.w))+'</span>';
+      else if(ready)badge='<span class="badge">UPCOMING</span>';
+
+      html+=`
+        <div class="match-row fix-row">
+          <strong>${esc(A)} <span class="muted">vs</span> ${esc(B)}</strong>
+          <span>
+            ${badge}
+            ${admin && ready ? `<button class="small secondary" onclick="scoreKo('${t.id}','${x.id}')">Score</button>` : ""}
+          </span>
+        </div>`;
+    });
+  });
+
+  return html;
+}
+
+function pointsTablesHTML(t){
+  const q=(t.format==="League") ? 0 : (Number(t.qualify) || 0);
+  const gs=groupList(t);
+  const head="<thead><tr><th>Team</th><th>P</th><th>W</th><th>L</th><th>T</th><th>NR</th><th>Pts</th><th>NRR</th></tr></thead>";
+  let html="";
+
+  gs.forEach(g=>{
+    const rows=calculatePoints(t,g);
+    html+=(g ? '<h3 class="fix-round">&gt; Group '+g+'</h3>' : "")+
+      '<div class="table-wrap"><table>'+head+"<tbody>"+
+      rows.map((x,i)=>'<tr class="'+(i<q ? "qual" : "")+'">'+pointsRow(x)+"</tr>").join("")+
+      "</tbody></table></div>";
+  });
+
+  if(q){
+    html+='<p class="muted">Green marker = qualifies for the knockout (top '+q+(gs.length>1 ? " of each group" : "")+").</p>";
+  }
+
+  return html;
+}
 
 /* ADD MATCH */
 function validateInnings(t,runs,wkts,overs,label){
@@ -905,7 +1173,42 @@ window.addMatch=async function(){
   const matches=[...(t.matches || [])];
   const matchId=id();
 
-  matches.push({
+  const fixtures=(t.fixtures || []).map(f=>({...f}));
+  const fx=fixtures.find(f=>
+    !f.matchId &&
+    ((f.a===a && f.b===b) || (f.a===b && f.b===a))
+  );
+
+  // Is this a knockout tie?
+  const ko=t.ko ? JSON.parse(JSON.stringify(t.ko)) : null;
+  let koTie=null;
+  if(ko && ko.rounds){
+    ko.rounds.forEach(r=>r.ties.forEach(x=>{
+      if(!koTie && !x.w && x.a && x.b &&
+         ((x.a===a && x.b===b) || (x.a===b && x.b===a)))koTie=x;
+    }));
+  }
+  const isKo=!!koTie && (!fx || (pendingKo && pendingKo.tieId===koTie.id));
+
+  let winner="";
+  if(isKo){
+    if(type==="noresult"){
+      msg("matchMsg","A knockout match needs a result.","error");
+      return;
+    }
+    if(ra>rb)winner=a;
+    else if(rb>ra)winner=b;
+    else{
+      const pick=document.getElementById("matchTieWinner").value;
+      if(!pick){
+        msg("matchMsg","Runs are level. Choose the winner in the tie-break box.","error");
+        return;
+      }
+      winner=pick==="a" ? a : b;
+    }
+  }
+
+  const match={
     id:matchId,
     a:a,b:b,
     ra:ra || 0,rb:rb || 0,
@@ -913,20 +1216,30 @@ window.addMatch=async function(){
     oa:oa || 0,ob:ob || 0,
     type:type,
     createdAt:Date.now()
-  });
+  };
+  if(isKo){
+    match.stage="ko";
+    match.winner=winner;
+  }
+  matches.push(match);
 
-  // Mark the matching fixture as played.
-  const fixtures=(t.fixtures || []).map(f=>({...f}));
-  const fx=fixtures.find(f=>
-    !f.matchId &&
-    ((f.a===a && f.b===b) || (f.a===b && f.b===a))
-  );
-  if(fx)fx.matchId=matchId;
+  const update={matches:matches};
+  if(isKo){
+    koTie.w=winner;
+    koTie.matchId=matchId;
+    propagateKo(ko);
+    update.ko=ko;
+  }else{
+    if(fx)fx.matchId=matchId;
+    update.fixtures=fixtures;
+  }
 
-  await updateDoc(doc(db,"tournaments",tournamentId),{matches:matches,fixtures:fixtures});
+  await updateDoc(doc(db,"tournaments",tournamentId),update);
+  pendingKo=null;
 
   ["runsA","runsB","wicketsA","wicketsB","oversA","oversB"]
     .forEach(x=>document.getElementById(x).value="");
+  document.getElementById("matchTieWinner").value="";
 
   msg("matchMsg","Match saved successfully!");
   await loadTournaments();
@@ -942,7 +1255,24 @@ window.deleteMatch=async function(tournamentId,matchId){
     f.matchId===matchId ? {...f,matchId:""} : f
   );
 
-  await updateDoc(doc(db,"tournaments",tournamentId),{matches:matches,fixtures:fixtures});
+  const update={matches:matches,fixtures:fixtures};
+  if(t.ko && t.ko.rounds){
+    const ko=JSON.parse(JSON.stringify(t.ko));
+    let changed=false;
+    ko.rounds.forEach(r=>r.ties.forEach(x=>{
+      if(x.matchId===matchId){
+        x.matchId="";
+        x.w="";
+        changed=true;
+      }
+    }));
+    if(changed){
+      propagateKo(ko);
+      update.ko=ko;
+    }
+  }
+
+  await updateDoc(doc(db,"tournaments",tournamentId),update);
   await loadTournaments();
 };
 
@@ -1066,10 +1396,10 @@ function oversToBalls(overs){
   return wholeOvers*6+balls;
 }
 
-function calculatePoints(t){
+function calculatePoints(t,group){
   const stats={};
 
-  (t.teams || []).forEach(team=>{
+  (t.teams || []).filter(team=>group===undefined || (team.group || "")===group).forEach(team=>{
     stats[team.id]={
       id:team.id,name:team.name,
       p:0,w:0,l:0,tie:0,nr:0,pts:0,
@@ -1078,7 +1408,7 @@ function calculatePoints(t){
   });
 
   (t.matches || []).forEach(m=>{
-    if(!stats[m.a] || !stats[m.b])return;
+    if(!stats[m.a] || !stats[m.b] || m.stage==="ko")return;
 
     const A=stats[m.a];
     const B=stats[m.b];
@@ -1160,18 +1490,8 @@ function pointsRow(x){
 }
 
 window.renderPoints=function(){
-  const tournamentId=document.getElementById("pointsTournament").value;
-  const body=document.getElementById("pointsBody");
-  body.innerHTML="";
-
-  const t=tournaments.find(x=>x.id===tournamentId);
-  if(!t)return;
-
-  calculatePoints(t).forEach(x=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=pointsRow(x);
-    body.appendChild(tr);
-  });
+  const t=tournaments.find(x=>x.id===document.getElementById("pointsTournament").value);
+  document.getElementById("pointsWrap").innerHTML=t ? pointsTablesHTML(t) : "";
 };
 
 /* RENDER ALL */
@@ -1182,6 +1502,7 @@ function renderAll(){
   renderMatches();
   renderDashboard();
   renderFixtures();
+  updateTeamGroupSelect();
 
   const matchTournament=document.getElementById("matchTournament");
   if(matchTournament && matchTournament.value){
@@ -1225,7 +1546,7 @@ function renderTournaments(){
 
     div.innerHTML=`
       <h3>${esc(t.name)}</h3>
-      <p class="muted">${esc(t.format)} • ${t.overs} overs</p>
+      <p class="muted">${esc(t.format)} • ${t.overs} overs${(t.groups>1 && t.format!=="Knockout") ? " • "+t.groups+" groups" : ""}</p>
       <p><span class="badge">${t.published ? "PUBLIC" : "PRIVATE"}</span></p>
 
       <button class="${t.published ? "gray" : ""}" onclick="togglePublish('${t.id}')">
@@ -1256,11 +1577,11 @@ function renderTeams(){
     title.textContent=t.name;
     box.appendChild(title);
 
-    t.teams.forEach(team=>{
+    [...t.teams].sort((x,y)=>(x.group || "").localeCompare(y.group || "")).forEach(team=>{
       const div=document.createElement("div");
       div.className="team-row";
       div.innerHTML=`
-        <strong>${esc(team.name)}</strong>
+        <strong>${esc(team.name)}</strong> ${team.group ? '<span class="badge">GROUP '+esc(team.group)+'</span>' : ""}
         <button class="danger small" style="float:right" onclick="deleteTeam('${t.id}','${team.id}')">Delete</button>
       `;
       box.appendChild(div);
@@ -1277,13 +1598,14 @@ function matchHTML(t,m){
   let result="No result";
   if(m.type==="tie" || (m.type!=="noresult" && m.ra===m.rb))result="Match tied";
   else if(m.type!=="noresult")result=(m.ra>m.rb ? nameA : nameB)+" won";
+  if(m.winner)result=(m.winner===m.a ? nameA : nameB)+" won"+(m.ra===m.rb ? " (tie-break)" : "");
 
   return `
     <p>
       <strong>${esc(nameA)}</strong> ${sc(m.ra,m.wa,m.oa)}<br>
       <strong>${esc(nameB)}</strong> ${sc(m.rb,m.wb,m.ob)}
     </p>
-    <p class="success">${esc(result)}</p>`;
+    <p class="success">${esc(result)} ${m.stage==="ko" ? '<span class="badge">KNOCKOUT</span>' : ""}</p>`;
 }
 
 /* RENDER MATCHES */
@@ -1360,11 +1682,16 @@ function renderPublic(t){
   (t.teams || []).forEach(team=>{
     const div=document.createElement("div");
     div.className="team-row";
-    div.textContent=team.name;
+    div.textContent=team.name+(team.group ? " (Group "+team.group+")" : "");
     teamsBox.appendChild(div);
   });
 
   document.getElementById("publicFixtures").innerHTML=fixturesHTML(t,false);
+
+  const koHtml=koHTML(t,false);
+  const koBox=document.getElementById("publicKnockout");
+  koBox.innerHTML=koHtml;
+  koBox.parentElement.classList.toggle("hidden",!koHtml);
 
   const matchesBox=document.getElementById("publicMatches");
   matchesBox.innerHTML="";
@@ -1379,13 +1706,7 @@ function renderPublic(t){
     matchesBox.appendChild(div);
   });
 
-  const body=document.getElementById("publicPointsBody");
-  body.innerHTML="";
-  calculatePoints(t).forEach(x=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=pointsRow(x);
-    body.appendChild(tr);
-  });
+  document.getElementById("publicPoints").innerHTML=pointsTablesHTML(t);
 }
 
 /* CREATE YOUR OWN */
