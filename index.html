@@ -1270,8 +1270,8 @@ function statsHTML(cid,t){
   const allowed=r=>(!search||r.name.toLowerCase().includes(search));
   const maxBy=(arr,key,filter)=>sortRows(arr.filter(x=>allowed(x)&&(filter||(()=>true))(x)),key)[0];
   const orange=maxBy(s.bat,"runs",x=>x.runs>0),purple=[...s.bowl].filter(x=>allowed(x)&&x.wkts>0).sort((a,b)=>b.wkts-a.wkts||a.runs-b.runs)[0];
-  const bestSr=maxBy(s.bat,"sr",x=>x.balls>=10),bestEco=maxBy(s.bowl,"econ",x=>x.balls>=12),hs=maxBy(s.bat,"hsr",x=>x.hsr>0);
-  let html='<div class="caps">'+capCard("🟠 Most Runs","#f59e0b",orange,orange&&orange.runs+" runs")+capCard("🟣 Most Wickets","#a78bfa",purple,purple&&purple.wkts+" wickets")+capCard("⚡ Best Strike Rate (10+ balls)","#22c55e",bestSr,bestSr&&bestSr.sr.toFixed(1))+capCard("🎯 Best Economy (12+ balls)","#38bdf8",bestEco,bestEco&&bestEco.econ.toFixed(2))+capCard("🏏 Highest Score","#2dd4bf",hs,hs&&hs.hs)+"</div>";
+  const bestSr=maxBy(s.bat,"sr",x=>x.balls>0),bestEco=maxBy(s.bowl,"econ",x=>x.balls>0),hs=maxBy(s.bat,"hsr",x=>x.hsr>0);
+  let html='<div class="caps">'+capCard("🟠 Most Runs","#f59e0b",orange,orange&&orange.runs+" runs")+capCard("🟣 Most Wickets","#a78bfa",purple,purple&&purple.wkts+" wickets")+capCard("⚡ Best Strike Rate","#22c55e",bestSr,bestSr&&bestSr.sr.toFixed(1))+capCard("🎯 Best Economy","#38bdf8",bestEco,bestEco&&bestEco.econ.toFixed(2))+capCard("🏏 Highest Score","#2dd4bf",hs,hs&&hs.hs)+"</div>";
   const tabs=[["bat","Batting"],["bowl","Bowling"],["allround","All-rounders"]];
   html+='<div class="stat-tabs">'+tabs.map(x=>'<button class="small '+(st.tab===x[0]?"":"gray")+'" onclick="statsTab(\''+cid+'\',\''+x[0]+'\')">'+x[1]+'</button>').join("")+"</div>";
   let rows=[],cols=STAT_COLS[st.tab];
@@ -1283,7 +1283,7 @@ function statsHTML(cid,t){
   rows=sortRows(rows,sortKey);
   html+='<div class="table-wrap"><table class="wide"><thead><tr>'+cols.map(c=>'<th class="sortable'+(c[2]===sortKey?" sorted":"")+'" onclick="statsSort(\''+cid+'\',\''+c[2]+'\')">'+c[1]+'</th>').join("")+'</tr></thead><tbody>'+
     rows.map(r=>'<tr>'+cols.map(c=>{let v=r[c[0]];if(c[0]==="name")return '<td><button class="player-link" onclick="openPlayerProfile(\''+cid+'\',\''+r.id+'\')">'+esc(v)+'</button></td>';if(v===null||v===undefined||v==="")v="-";else if(typeof v==="number"&&!Number.isInteger(v))v=v.toFixed(2);return '<td>'+esc(v)+'</td>';}).join("")+'</tr>').join("")+'</tbody></table></div>'+
-    '<p class="stats-note">Tap a column heading to sort and a player name to open their profile. Every team is one player. Batting uses the player’s own runs, wickets lost and overs; bowling uses the opponent’s runs, wickets and overs in the same match. Best strike rate needs 10+ balls and best economy 12+ balls. Stats update automatically from saved matches, so deleting a match also removes it from the stats. No-result matches are ignored.</p>';
+    '<p class="stats-note">Tap a column heading to sort and a player name to open their profile. Every team is one player. Batting uses the player’s own runs, wickets lost and overs; bowling uses the opponent’s runs, wickets and overs in the same match. Stats update automatically from saved matches, so deleting a match also removes it from the stats. No-result matches are ignored.</p>';
   return html;
 }
 
