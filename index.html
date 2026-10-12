@@ -326,16 +326,6 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
     <p id="teamMsg"></p>
   </div>
   <div class="card">
-    <h2>👤 Squad (players)</h2>
-    <label class="muted">Tournament</label>
-    <select id="squadTournament" onchange="updateSquadTeamSelect()"><option value="">Choose Tournament</option></select>
-    <label class="muted">Team</label>
-    <select id="squadTeam"><option value="">Choose Team</option></select>
-    <textarea id="squadNames" rows="5" placeholder="One player name per line (or separate with commas)"></textarea>
-    <button onclick="addPlayers()">Add Players</button>
-    <p id="squadMsg"></p>
-  </div>
-  <div class="card">
     <h2>Teams</h2>
     <div id="teamList"></div>
   </div>
@@ -1208,75 +1198,6 @@ function teamById(t,tid){
   return (t.teams || []).find(x=>x.id===tid);
 }
 
-function chipsHTML(t,team){
-  const list=team.players || [];
-  if(!list.length)return '<div class="muted" style="clear:both;margin-top:8px">No players yet</div>';
-  return '<div style="clear:both;margin-top:8px">'+
-    list.map(p=>'<span class="chip">'+esc(p.name)+
-      ' <b onclick="deletePlayer(\''+t.id+'\',\''+team.id+'\',\''+p.id+'\')">×</b></span>').join("")+
-    "</div>";
-}
-
-window.updateSquadTeamSelect=function(){
-  const sel=document.getElementById("squadTeam");
-  if(!sel)return;
-  const t=tournaments.find(x=>x.id===document.getElementById("squadTournament").value);
-  const old=sel.value;
-  sel.innerHTML='<option value="">Choose Team</option>'+
-    (t ? (t.teams || []).map(x=>'<option value="'+x.id+'">'+esc(x.name)+(x.group ? " (Group "+x.group+")" : "")+"</option>").join("") : "");
-  if(old && t && (t.teams || []).some(x=>x.id===old))sel.value=old;
-};
-
-window.addPlayers=async function(){
-  const tournamentId=document.getElementById("squadTournament").value;
-  const teamId=document.getElementById("squadTeam").value;
-  const names=document.getElementById("squadNames").value
-    .split(/[\n,]+/).map(x=>x.trim()).filter(Boolean);
-
-  const t=tournaments.find(x=>x.id===tournamentId);
-  if(!t || !teamId){
-    msg("squadMsg","Choose a tournament and a team first.","error");
-    return;
-  }
-  if(!names.length){
-    msg("squadMsg","Type at least one player name.","error");
-    return;
-  }
-
-  let added=0;
-  const teams=(t.teams || []).map(tm=>{
-    if(tm.id!==teamId)return tm;
-    const players=[...(tm.players || [])];
-    names.forEach(n=>{
-      if(!players.some(p=>p.name.toLowerCase()===n.toLowerCase())){
-        players.push({id:id(),name:n});
-        added++;
-      }
-    });
-    return {...tm,players:players};
-  });
-
-  try{
-    await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams});
-    document.getElementById("squadNames").value="";
-    msg("squadMsg",added+" player(s) added.");
-    await loadTournaments();
-  }catch(error){
-    msg("squadMsg",error.message,"error");
-  }
-};
-
-window.deletePlayer=async function(tournamentId,teamId,playerId){
-  const t=tournaments.find(x=>x.id===tournamentId);
-  if(!t)return;
-  if(!confirm("Remove this player from the squad? Stats already saved for this player stay in the scorecards."))return;
-
-  const teams=(t.teams || []).map(tm=>
-    tm.id===teamId ? {...tm,players:(tm.players || []).filter(p=>p.id!==playerId)} : tm
-  );
-  await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams});
-  await loadTournaments();
-};
 
 /* ---------- scorecard editor ---------- */
 
@@ -1886,7 +1807,7 @@ window.showSection=function(section){
 
 /* TOURNAMENT DROPDOWNS */
 function populateTournamentDropdowns(){
-  const ids=["teamTournament","squadTournament","fixtureTournament","matchTournament","pointsTournament","statsTournament"];
+  const ids=["teamTournament","fixtureTournament","matchTournament","pointsTournament","statsTournament"];
 
   ids.forEach(dropdownId=>{
     const select=document.getElementById(dropdownId);
@@ -2060,7 +1981,6 @@ function renderAll(){
   renderDashboard();
   renderFixtures();
   updateTeamGroupSelect();
-  updateSquadTeamSelect();
   renderStats();
 
   const matchTournament=document.getElementById("matchTournament");
@@ -2142,7 +2062,6 @@ function renderTeams(){
       div.innerHTML=`
         <strong>${esc(team.name)}</strong> ${team.group ? '<span class="badge">GROUP '+esc(team.group)+'</span>' : ""}
         <button class="danger small" style="float:right" onclick="deleteTeam('${t.id}','${team.id}')">Delete</button>
-        ${chipsHTML(t,team)}
       `;
       box.appendChild(div);
     });
