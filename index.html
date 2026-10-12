@@ -133,6 +133,32 @@ table{font-size:14px}
 input:not([type=checkbox]),select{transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
 input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;box-shadow:0 0 0 3px rgba(34,197,94,.28),0 0 18px rgba(56,189,248,.35)}
 .qual td:first-child{border-left:3px solid #22c55e}
+/* STATS & SCORECARD */
+#stats{--ac:#f472b6}
+#navStats{--ac:#f472b6}
+#scorecard{--ac:#fb7185}
+textarea{width:100%;padding:12px;margin:7px 0;border-radius:8px;border:1px solid #4a6a8f;background:#0a1626;color:#fff;font-size:16px;font-family:inherit}
+textarea:focus{outline:none;border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.28)}
+.chip{display:inline-block;background:#0a1626;border:1px solid #2a3f5c;border-radius:999px;padding:4px 10px;margin:3px 4px 0 0;font-size:14px}
+.chip b{color:#f87171;cursor:pointer;margin-left:6px}
+.sc-row{background:#16263c;border:1px solid #2a3f5c;border-left:4px solid var(--ac);border-radius:10px;padding:10px;margin:8px 0}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;margin:6px 0}
+.sc-grid small{display:block;color:#b4c0d0;font-size:12px}
+.sc-grid input,.sc-grid select{margin:2px 0;min-height:40px;padding:8px}
+.caps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.cap{background:#16263c;border:1px solid #2a3f5c;border-top:3px solid var(--cc,#f59e0b);border-radius:12px;padding:10px;text-align:center}
+.cap small{display:block;color:#b4c0d0;font-size:13px}
+.cap b{display:block;font-size:16px;margin:2px 0}
+.cap span{color:var(--cc,#f59e0b);font-weight:700}
+.stat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+table.wide{min-width:760px}
+table.mini{min-width:0;font-size:14px;margin-top:6px}
+table.mini th,table.mini td{padding:6px 4px}
+th.sortable{cursor:pointer;white-space:nowrap}
+th.sorted{text-decoration:underline}
+details.sc{margin-top:8px}
+details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
+.match-row button{margin-right:6px}
 /* PAGE TRANSITIONS */
 .section.enter{animation:secIn .6s cubic-bezier(.2,.8,.2,1) both}
 .section.enter>.card,.section.enter>.grid>.stat{animation:cardIn .7s cubic-bezier(.2,.8,.2,1) both}
@@ -233,6 +259,7 @@ input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;bo
   <button id="navFixtures" onclick="showSection('fixtures')">Fixtures</button>
   <button id="navMatches" onclick="showSection('matches')">Match Scoring</button>
   <button id="navPoints" onclick="showSection('points')">Points Table</button>
+  <button id="navStats" onclick="showSection('stats')">Stats</button>
   <button onclick="logout()">Logout</button>
 </nav>
 
@@ -290,6 +317,16 @@ input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;bo
     <button onclick="addTeam()">Add Team</button>
     <button id="teamDrawBtn" class="secondary hidden" onclick="drawGroups()">🎲 Draw groups randomly</button>
     <p id="teamMsg"></p>
+  </div>
+  <div class="card">
+    <h2>👤 Squad (players)</h2>
+    <label class="muted">Tournament</label>
+    <select id="squadTournament" onchange="updateSquadTeamSelect()"><option value="">Choose Tournament</option></select>
+    <label class="muted">Team</label>
+    <select id="squadTeam"><option value="">Choose Team</option></select>
+    <textarea id="squadNames" rows="5" placeholder="One player name per line (or separate with commas)"></textarea>
+    <button onclick="addPlayers()">Add Players</button>
+    <p id="squadMsg"></p>
   </div>
   <div class="card">
     <h2>Teams</h2>
@@ -374,6 +411,29 @@ input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;bo
   </div>
 </section>
 
+<!-- STATS -->
+<section id="stats" class="section hidden">
+  <div class="card">
+    <h2>📈 Player Stats</h2>
+    <select id="statsTournament" onchange="renderStats()"><option value="">Choose Tournament</option></select>
+    <div id="statsWrap"></div>
+  </div>
+</section>
+
+<!-- SCORECARD -->
+<section id="scorecard" class="section hidden">
+  <div class="card">
+    <h2>📋 Scorecard</h2>
+    <p class="muted" id="scTitle"></p>
+    <button class="small gray" onclick="showSection('matches')">← Back to matches</button>
+  </div>
+  <div id="scBody" oninput="scExtras()"></div>
+  <div class="card">
+    <button onclick="saveScorecard()">Save scorecard</button>
+    <p id="scMsg"></p>
+  </div>
+</section>
+
 </div>
 </div>
 
@@ -410,6 +470,11 @@ input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;bo
     <div class="card">
       <h2>📊 Points Table</h2>
       <div id="publicPoints"></div>
+    </div>
+
+    <div class="card hidden" id="publicStatsCard">
+      <h2>📈 Player Stats</h2>
+      <div id="publicStats"></div>
     </div>
 
     <div class="card" style="text-align:center">
@@ -1119,6 +1184,493 @@ function pointsTablesHTML(t){
   return html;
 }
 
+/* =========================
+   SQUADS, SCORECARDS & STATS
+========================= */
+
+let scState=null;
+const statsState={};
+
+function teamById(t,tid){
+  return (t.teams || []).find(x=>x.id===tid);
+}
+
+function chipsHTML(t,team){
+  const list=team.players || [];
+  if(!list.length)return '<div class="muted" style="clear:both;margin-top:8px">No players yet</div>';
+  return '<div style="clear:both;margin-top:8px">'+
+    list.map(p=>'<span class="chip">'+esc(p.name)+
+      ' <b onclick="deletePlayer(\''+t.id+'\',\''+team.id+'\',\''+p.id+'\')">×</b></span>').join("")+
+    "</div>";
+}
+
+window.updateSquadTeamSelect=function(){
+  const sel=document.getElementById("squadTeam");
+  if(!sel)return;
+  const t=tournaments.find(x=>x.id===document.getElementById("squadTournament").value);
+  const old=sel.value;
+  sel.innerHTML='<option value="">Choose Team</option>'+
+    (t ? (t.teams || []).map(x=>'<option value="'+x.id+'">'+esc(x.name)+(x.group ? " (Group "+x.group+")" : "")+"</option>").join("") : "");
+  if(old && t && (t.teams || []).some(x=>x.id===old))sel.value=old;
+};
+
+window.addPlayers=async function(){
+  const tournamentId=document.getElementById("squadTournament").value;
+  const teamId=document.getElementById("squadTeam").value;
+  const names=document.getElementById("squadNames").value
+    .split(/[\n,]+/).map(x=>x.trim()).filter(Boolean);
+
+  const t=tournaments.find(x=>x.id===tournamentId);
+  if(!t || !teamId){
+    msg("squadMsg","Choose a tournament and a team first.","error");
+    return;
+  }
+  if(!names.length){
+    msg("squadMsg","Type at least one player name.","error");
+    return;
+  }
+
+  let added=0;
+  const teams=(t.teams || []).map(tm=>{
+    if(tm.id!==teamId)return tm;
+    const players=[...(tm.players || [])];
+    names.forEach(n=>{
+      if(!players.some(p=>p.name.toLowerCase()===n.toLowerCase())){
+        players.push({id:id(),name:n});
+        added++;
+      }
+    });
+    return {...tm,players:players};
+  });
+
+  try{
+    await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams});
+    document.getElementById("squadNames").value="";
+    msg("squadMsg",added+" player(s) added.");
+    await loadTournaments();
+  }catch(error){
+    msg("squadMsg",error.message,"error");
+  }
+};
+
+window.deletePlayer=async function(tournamentId,teamId,playerId){
+  const t=tournaments.find(x=>x.id===tournamentId);
+  if(!t)return;
+  if(!confirm("Remove this player from the squad? Stats already saved for this player stay in the scorecards."))return;
+
+  const teams=(t.teams || []).map(tm=>
+    tm.id===teamId ? {...tm,players:(tm.players || []).filter(p=>p.id!==playerId)} : tm
+  );
+  await updateDoc(doc(db,"tournaments",tournamentId),{teams:teams});
+  await loadTournaments();
+};
+
+/* ---------- scorecard editor ---------- */
+
+function scRowHTML(kind,t,tid,e){
+  const tm=teamById(t,tid);
+  const opts=(tm.players || []).map(p=>
+    '<option value="'+p.id+'"'+(e && e.p===p.id ? " selected" : "")+">"+esc(p.name)+"</option>"
+  ).join("");
+  const sel='<select class="sc-p"><option value="">Choose player</option>'+opts+"</select>";
+  const inp=(f,label,val,step)=>'<div><small>'+label+'</small><input data-f="'+f+'" type="number" min="0"'+
+    (step ? ' step="'+step+'"' : "")+' inputmode="decimal" value="'+(val===undefined || val===null ? "" : val)+'"></div>';
+
+  let grid="";
+  if(kind==="bat"){
+    grid=inp("r","Runs",e && e.r)+inp("b","Balls",e && e.b)+inp("f","4s",e && e.f)+inp("s","6s",e && e.s)+
+      '<div><small>Status</small><select data-f="out"><option value="0"'+(e && e.out ? "" : " selected")+'>Not out</option><option value="1"'+(e && e.out ? " selected" : "")+">Out</option></select></div>";
+  }else if(kind==="bowl"){
+    const ov=e ? Math.floor(e.bl/6)+"."+(e.bl%6) : "";
+    grid=inp("o","Overs",ov,"0.1")+inp("m","Maidens",e && e.m)+inp("r","Runs",e && e.r)+inp("w","Wickets",e && e.w);
+  }else{
+    grid=inp("c","Catches",e && e.c)+inp("ro","Run-outs",e && e.ro)+inp("st","Stumpings",e && e.st);
+  }
+
+  return '<div class="sc-row" data-kind="'+kind+'" data-team="'+tid+'">'+sel+
+    '<div class="sc-grid">'+grid+"</div>"+
+    '<button class="small danger" onclick="this.closest(\'.sc-row\').remove();scExtras()">Remove</button></div>';
+}
+
+function scBox(kind,tid){
+  return document.getElementById((kind==="bat" ? "scb-" : kind==="bowl" ? "scw-" : "scf-")+tid);
+}
+
+window.scAddRow=function(kind,tid){
+  if(!scState)return;
+  const t=tournaments.find(x=>x.id===scState.tid);
+  if(!t)return;
+  scBox(kind,tid).insertAdjacentHTML("beforeend",scRowHTML(kind,t,tid,null));
+};
+
+window.scAddAll=function(tid){
+  if(!scState)return;
+  const t=tournaments.find(x=>x.id===scState.tid);
+  const tm=t && teamById(t,tid);
+  if(!tm)return;
+  scBox("bat",tid).innerHTML="";
+  (tm.players || []).forEach(p=>{
+    scBox("bat",tid).insertAdjacentHTML("beforeend",scRowHTML("bat",t,tid,{p:p.id,r:"",b:"",f:"",s:"",out:0}));
+  });
+};
+
+window.scExtras=function(){
+  if(!scState)return;
+  const t=tournaments.find(x=>x.id===scState.tid);
+  const m=t && (t.matches || []).find(x=>x.id===scState.mid);
+  if(!m)return;
+
+  [[m.a,m.ra],[m.b,m.rb]].forEach(pair=>{
+    const el=document.getElementById("sce-"+pair[0]);
+    if(!el)return;
+    let sum=0;
+    document.querySelectorAll("#scb-"+pair[0]+' .sc-row [data-f="r"]').forEach(i=>{sum+=Number(i.value) || 0;});
+    const ex=(Number(pair[1]) || 0)-sum;
+    el.innerHTML="Team total "+(Number(pair[1]) || 0)+" • Batters "+sum+" • Extras "+
+      (ex<0 ? '<span class="error">'+ex+" (batters exceed the team total)</span>" : ex);
+  });
+};
+
+window.openScorecard=function(tournamentId,matchId){
+  const t=tournaments.find(x=>x.id===tournamentId);
+  const m=t && (t.matches || []).find(x=>x.id===matchId);
+  if(!m)return;
+
+  scState={tid:tournamentId,mid:matchId};
+  const A=teamById(t,m.a);
+  const B=teamById(t,m.b);
+  if(!A || !B){
+    alert("Both teams of this match must still exist.");
+    return;
+  }
+
+  document.getElementById("scTitle").textContent=
+    A.name+" "+m.ra+"/"+(m.wa || 0)+"  vs  "+B.name+" "+m.rb+"/"+(m.wb || 0);
+  document.getElementById("scMsg").textContent="";
+
+  let html="";
+  [A,B].forEach(tm=>{
+    const hasSquad=(tm.players || []).length>0;
+    html+=`
+      <div class="card">
+        <h2>${esc(tm.name)} – Batting</h2>
+        <p class="muted" id="sce-${tm.id}"></p>
+        ${hasSquad ? "" : '<p class="warning">Add players to this team in Teams → Squad first.</p>'}
+        <div id="scb-${tm.id}"></div>
+        ${hasSquad ? `<button class="small" onclick="scAddRow('bat','${tm.id}')">+ Add batter</button>
+        <button class="small secondary" onclick="scAddAll('${tm.id}')">+ Add all players</button>` : ""}
+      </div>
+      <div class="card">
+        <h2>${esc(tm.name)} – Bowling</h2>
+        <div id="scw-${tm.id}"></div>
+        ${hasSquad ? `<button class="small" onclick="scAddRow('bowl','${tm.id}')">+ Add bowler</button>` : ""}
+        <details class="sc">
+          <summary>Fielding (optional)</summary>
+          <div id="scf-${tm.id}"></div>
+          ${hasSquad ? `<button class="small" onclick="scAddRow('field','${tm.id}')">+ Add fielder</button>` : ""}
+        </details>
+      </div>`;
+  });
+
+  const pomOpts=[A,B].map(tm=>
+    '<optgroup label="'+esc(tm.name)+'">'+(tm.players || []).map(p=>
+      '<option value="'+p.id+'"'+(m.card && m.card.pom===p.id ? " selected" : "")+">"+esc(p.name)+"</option>").join("")+"</optgroup>"
+  ).join("");
+  html+='<div class="card"><h2>⭐ Player of the Match</h2><select id="scPom"><option value="">None</option>'+pomOpts+"</select></div>";
+
+  document.getElementById("scBody").innerHTML=html;
+
+  // fill existing scorecard
+  const c=m.card || {bat:[],bowl:[],field:[]};
+  (c.bat || []).forEach(e=>scBox("bat",e.t) && scBox("bat",e.t).insertAdjacentHTML("beforeend",scRowHTML("bat",t,e.t,e)));
+  (c.bowl || []).forEach(e=>scBox("bowl",e.t) && scBox("bowl",e.t).insertAdjacentHTML("beforeend",scRowHTML("bowl",t,e.t,e)));
+  (c.field || []).forEach(e=>scBox("field",e.t) && scBox("field",e.t).insertAdjacentHTML("beforeend",scRowHTML("field",t,e.t,e)));
+  scExtras();
+
+  showSection("scorecard");
+  const nav=document.getElementById("navMatches");
+  if(nav)nav.classList.add("active");
+};
+
+window.saveScorecard=async function(){
+  if(!scState)return;
+  const t=tournaments.find(x=>x.id===scState.tid);
+  const m=t && (t.matches || []).find(x=>x.id===scState.mid);
+  if(!m)return;
+
+  const fail=text=>{
+    msg("scMsg",text,"error");
+    return null;
+  };
+
+  const card={bat:[],bowl:[],field:[],pom:"",pomN:"",pomT:""};
+  const seen=new Set();
+
+  const rows=document.querySelectorAll("#scBody .sc-row");
+  for(const row of rows){
+    const kind=row.dataset.kind;
+    const tid=row.dataset.team;
+    const tm=teamById(t,tid);
+    const pid=row.querySelector(".sc-p").value;
+    const label=tm.name;
+
+    if(!pid)return fail(label+": choose a player in every row (or remove the empty row).");
+    const player=(tm.players || []).find(p=>p.id===pid);
+    const key=kind+tid+pid;
+    if(seen.has(key))return fail(label+": "+player.name+" is added twice.");
+    seen.add(key);
+
+    const num=f=>{
+      const el=row.querySelector('[data-f="'+f+'"]');
+      return el && el.value!=="" ? Number(el.value) : 0;
+    };
+    const ints=fs=>fs.every(f=>Number.isInteger(num(f)) && num(f)>=0);
+
+    if(kind==="bat"){
+      if(!ints(["r","b","f","s"]))return fail(player.name+": runs, balls, 4s and 6s must be whole numbers.");
+      const r=num("r"),b=num("b"),f=num("f"),sx=num("s");
+      if(f*4+sx*6>r)return fail(player.name+": 4s and 6s give more runs than the total runs.");
+      if(f+sx>b)return fail(player.name+": 4s + 6s cannot be more than balls faced.");
+      card.bat.push({p:pid,n:player.name,t:tid,r:r,b:b,f:f,s:sx,out:row.querySelector('[data-f="out"]').value==="1"});
+    }else if(kind==="bowl"){
+      const ov=num("o");
+      const whole=Math.floor(ov);
+      const frac=Math.round((ov-whole)*10);
+      if(!(ov>0) || frac>5)return fail(player.name+": enter valid overs (for example 3.2; 3.6 does not exist).");
+      if(!ints(["m","r","w"]))return fail(player.name+": maidens, runs and wickets must be whole numbers.");
+      if(num("m")>whole)return fail(player.name+": maidens cannot be more than the overs bowled.");
+      if(num("w")>10)return fail(player.name+": wickets cannot be more than 10.");
+      card.bowl.push({p:pid,n:player.name,t:tid,bl:whole*6+frac,m:num("m"),r:num("r"),w:num("w")});
+    }else{
+      if(!ints(["c","ro","st"]))return fail(player.name+": fielding numbers must be whole numbers.");
+      card.field.push({p:pid,n:player.name,t:tid,c:num("c"),ro:num("ro"),st:num("st")});
+    }
+  }
+
+  // batters' runs must not be more than the team total
+  for(const pair of [[m.a,m.ra],[m.b,m.rb]]){
+    const sum=card.bat.filter(e=>e.t===pair[0]).reduce((a,e)=>a+e.r,0);
+    if(sum>(Number(pair[1]) || 0))return fail(teamById(t,pair[0]).name+": batters' runs ("+sum+") are more than the team total ("+pair[1]+").");
+  }
+
+  const pom=document.getElementById("scPom").value;
+  if(pom){
+    [m.a,m.b].forEach(tid=>{
+      const pl=(teamById(t,tid).players || []).find(p=>p.id===pom);
+      if(pl){
+        card.pom=pom;
+        card.pomN=pl.name;
+        card.pomT=tid;
+      }
+    });
+  }
+
+  const matches=(t.matches || []).map(x=>x.id===m.id ? {...x,card:card} : x);
+
+  try{
+    await updateDoc(doc(db,"tournaments",scState.tid),{matches:matches});
+    msg("scMsg","Scorecard saved!");
+    await loadTournaments();
+  }catch(error){
+    msg("scMsg",error.message,"error");
+  }
+};
+
+/* ---------- scorecard display inside match cards ---------- */
+
+function cardHTML(t,m){
+  const c=m.card;
+  if(!c || (!(c.bat || []).length && !(c.bowl || []).length))return "";
+
+  const sr=(r,b)=>b>0 ? (r*100/b).toFixed(1) : "-";
+  let html='<details class="sc"><summary>Scorecard</summary>';
+
+  [m.a,m.b].forEach(tid=>{
+    const team=teamById(t,tid);
+    const bats=(c.bat || []).filter(e=>e.t===tid);
+    const bowls=(c.bowl || []).filter(e=>e.t===tid);
+    if(!bats.length && !bowls.length)return;
+
+    html+="<h3>"+esc(team ? team.name : "Team")+"</h3>";
+
+    if(bats.length){
+      html+='<table class="mini"><thead><tr><th>Batter</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr></thead><tbody>'+
+        bats.map(e=>"<tr><td>"+esc(e.n)+(e.out ? "" : "*")+"</td><td>"+e.r+"</td><td>"+e.b+"</td><td>"+e.f+"</td><td>"+e.s+"</td><td>"+sr(e.r,e.b)+"</td></tr>").join("")+
+        "</tbody></table>";
+    }
+    if(bowls.length){
+      html+='<table class="mini"><thead><tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Eco</th></tr></thead><tbody>'+
+        bowls.map(e=>"<tr><td>"+esc(e.n)+"</td><td>"+Math.floor(e.bl/6)+"."+(e.bl%6)+"</td><td>"+e.m+"</td><td>"+e.r+"</td><td>"+e.w+"</td><td>"+(e.bl>0 ? (e.r*6/e.bl).toFixed(2) : "-")+"</td></tr>").join("")+
+        "</tbody></table>";
+    }
+  });
+
+  if(c.pom)html+='<p class="success">⭐ Player of the Match: '+esc(c.pomN || "")+"</p>";
+  return html+"</details>";
+}
+
+/* ---------- stats ---------- */
+
+function calcStats(t){
+  const pl={};
+  const tn={};
+  (t.teams || []).forEach(tm=>{
+    tn[tm.id]=tm.name;
+    (tm.players || []).forEach(p=>{pl[p.id]={name:p.name,team:tm.name};});
+  });
+  const info=e=>({name:(pl[e.p] && pl[e.p].name) || e.n || "?",team:(pl[e.p] && pl[e.p].team) || tn[e.t] || ""});
+
+  const bat={},bowl={},field={};
+
+  (t.matches || []).forEach(m=>{
+    const c=m.card;
+    if(!c)return;
+
+    (c.bat || []).forEach(e=>{
+      const s=bat[e.p] || (bat[e.p]={id:e.p,...info(e),ms:new Set(),inns:0,no:0,runs:0,balls:0,fours:0,sixes:0,fifties:0,hundreds:0,ducks:0,hsr:-1,hsno:false});
+      s.ms.add(m.id);
+      s.inns++;
+      if(!e.out)s.no++;
+      s.runs+=e.r; s.balls+=e.b; s.fours+=e.f; s.sixes+=e.s;
+      if(e.r>=100)s.hundreds++; else if(e.r>=50)s.fifties++;
+      if(e.out && e.r===0)s.ducks++;
+      if(e.r>s.hsr || (e.r===s.hsr && !e.out && !s.hsno)){s.hsr=e.r;s.hsno=!e.out;}
+    });
+
+    (c.bowl || []).forEach(e=>{
+      const s=bowl[e.p] || (bowl[e.p]={id:e.p,...info(e),ms:new Set(),balls:0,maidens:0,runs:0,wkts:0,bw:-1,br:0,w3:0,w5:0});
+      s.ms.add(m.id);
+      s.balls+=e.bl; s.maidens+=e.m; s.runs+=e.r; s.wkts+=e.w;
+      if(e.w>=5)s.w5++; else if(e.w>=3)s.w3++;
+      if(e.w>s.bw || (e.w===s.bw && e.r<s.br)){s.bw=e.w;s.br=e.r;}
+    });
+
+    (c.field || []).forEach(e=>{
+      const s=field[e.p] || (field[e.p]={id:e.p,...info(e),ms:new Set(),catches:0,ro:0,st:0,potm:0});
+      s.ms.add(m.id);
+      s.catches+=e.c; s.ro+=e.ro; s.st+=e.st;
+    });
+
+    if(c.pom){
+      const s=field[c.pom] || (field[c.pom]={id:c.pom,...info({p:c.pom,n:c.pomN,t:c.pomT}),ms:new Set(),catches:0,ro:0,st:0,potm:0});
+      s.ms.add(m.id);
+      s.potm++;
+    }
+  });
+
+  return {
+    bat:Object.values(bat).map(s=>({...s,mat:s.ms.size,hs:s.hsr+(s.hsno ? "*" : ""),
+      avg:(s.inns-s.no)>0 ? s.runs/(s.inns-s.no) : null,
+      sr:s.balls>0 ? s.runs*100/s.balls : null})),
+    bowl:Object.values(bowl).map(s=>({...s,mat:s.ms.size,
+      overs:Math.floor(s.balls/6)+"."+(s.balls%6),
+      econ:s.balls>0 ? s.runs*6/s.balls : null,
+      bavg:s.wkts>0 ? s.runs/s.wkts : null,
+      bsr:s.wkts>0 ? s.balls/s.wkts : null,
+      best:s.bw>=0 ? s.bw+"/"+s.br : "-"})),
+    field:Object.values(field).map(s=>({...s,mat:s.ms.size,total:s.catches+s.ro+s.st}))
+  };
+}
+
+const STAT_COLS={
+  bat:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["inns","Inn","inns"],["runs","Runs","runs"],["hs","HS","hsr"],["avg","Avg","avg"],["sr","SR","sr"],["fours","4s","fours"],["sixes","6s","sixes"],["fifties","50","fifties"],["hundreds","100","hundreds"],["no","NO","no"]],
+  bowl:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["overs","O","balls"],["maidens","Mdn","maidens"],["runs","Runs","runs"],["wkts","Wkts","wkts"],["bavg","Avg","bavg"],["econ","Econ","econ"],["bsr","SR","bsr"],["best","Best","bw"],["w3","3W","w3"],["w5","5W","w5"]],
+  field:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["catches","Ct","catches"],["ro","RO","ro"],["st","St","st"],["total","Total","total"],["potm","POTM","potm"]]
+};
+const LOWER_BETTER=["bavg","econ","bsr"];
+
+function sortRows(rows,key){
+  const lower=LOWER_BETTER.includes(key);
+  return [...rows].sort((a,b)=>{
+    const x=a[key],y=b[key];
+    if((x===null || x===undefined) && (y===null || y===undefined))return 0;
+    if(x===null || x===undefined)return 1;
+    if(y===null || y===undefined)return -1;
+    if(typeof x==="string")return String(x).localeCompare(String(y));
+    return lower ? x-y : y-x;
+  });
+}
+
+function capCard(label,color,row,value){
+  if(!row)return "";
+  return '<div class="cap" style="--cc:'+color+'"><small>'+label+"</small><b>"+esc(row.name)+"</b><span>"+value+"</span></div>";
+}
+
+function statsHTML(cid,t){
+  const st=statsState[cid] || (statsState[cid]={tab:"bat",sort:{bat:"runs",bowl:"wkts",field:"total"}});
+  const s=calcStats(t);
+
+  if(!s.bat.length && !s.bowl.length && !s.field.length){
+    return '<p class="muted">No scorecards yet. Go to Match Scoring and tap "Add scorecard" on a match.</p>';
+  }
+
+  const maxBy=(arr,key,filter)=>sortRows(arr.filter(filter || (()=>true)),key)[0];
+  const orange=maxBy(s.bat,"runs",x=>x.runs>0);
+  const purple=[...s.bowl].filter(x=>x.wkts>0).sort((a,b)=>b.wkts-a.wkts || a.runs-b.runs)[0];
+  const bestSr=maxBy(s.bat,"sr",x=>x.balls>=10);
+  const bestEco=maxBy(s.bowl,"econ",x=>x.balls>=12);
+  const sixes=maxBy(s.bat,"sixes",x=>x.sixes>0);
+  const hs=maxBy(s.bat,"hsr",x=>x.hsr>0);
+
+  let html='<div class="caps">'+
+    capCard("🟠 Orange Cap","#f59e0b",orange,orange && orange.runs+" runs")+
+    capCard("🟣 Purple Cap","#a78bfa",purple,purple && purple.wkts+" wkts")+
+    capCard("⚡ Best Strike Rate","#22c55e",bestSr,bestSr && bestSr.sr.toFixed(1))+
+    capCard("🎯 Best Economy","#38bdf8",bestEco,bestEco && bestEco.econ.toFixed(2))+
+    capCard("💥 Most Sixes","#fb7185",sixes,sixes && sixes.sixes+" sixes")+
+    capCard("🏏 Highest Score","#2dd4bf",hs,hs && hs.hs)+
+    "</div>";
+
+  const tabs=[["bat","Batting"],["bowl","Bowling"],["field","Fielding"]];
+  html+='<div class="stat-tabs">'+tabs.map(x=>
+    '<button class="small '+(st.tab===x[0] ? "" : "gray")+'" onclick="statsTab(\''+cid+'\',\''+x[0]+'\')">'+x[1]+"</button>").join("")+"</div>";
+
+  const cols=STAT_COLS[st.tab];
+  const sortKey=st.sort[st.tab];
+  const rows=sortRows(s[st.tab],sortKey);
+
+  html+='<div class="table-wrap"><table class="wide"><thead><tr>'+
+    cols.map(c=>'<th class="sortable'+(c[2]===sortKey ? " sorted" : "")+'" onclick="statsSort(\''+cid+'\',\''+c[2]+'\')">'+c[1]+"</th>").join("")+
+    "</tr></thead><tbody>"+
+    rows.map(r=>"<tr>"+cols.map(c=>{
+      let v=r[c[0]];
+      if(v===null || v===undefined)v="-";
+      else if(typeof v==="number" && !Number.isInteger(v))v=v.toFixed(2);
+      return "<td>"+esc(v)+"</td>";
+    }).join("")+"</tr>").join("")+
+    "</tbody></table></div>"+
+    '<p class="muted">Tap a column heading to sort. * = not out. Avg and SR are blank until they can be worked out.</p>';
+
+  return html;
+}
+
+function statsTournamentFor(cid){
+  if(cid==="publicStats")return publicTournament;
+  return tournaments.find(x=>x.id===document.getElementById("statsTournament").value);
+}
+
+function refreshStats(cid){
+  const box=document.getElementById(cid);
+  if(!box)return;
+  const t=statsTournamentFor(cid);
+  box.innerHTML=t ? statsHTML(cid,t) : '<p class="muted">Choose a tournament.</p>';
+}
+
+window.renderStats=function(){
+  refreshStats("statsWrap");
+};
+
+window.statsTab=function(cid,tab){
+  statsState[cid].tab=tab;
+  refreshStats(cid);
+};
+
+window.statsSort=function(cid,key){
+  const st=statsState[cid];
+  st.sort[st.tab]=key;
+  refreshStats(cid);
+};
+
 /* ADD MATCH */
 function validateInnings(t,runs,wkts,overs,label){
   if(runs<0 || !Number.isInteger(runs))return label+": enter valid runs.";
@@ -1329,7 +1881,7 @@ window.showSection=function(section){
 
 /* TOURNAMENT DROPDOWNS */
 function populateTournamentDropdowns(){
-  const ids=["teamTournament","fixtureTournament","matchTournament","pointsTournament"];
+  const ids=["teamTournament","squadTournament","fixtureTournament","matchTournament","pointsTournament","statsTournament"];
 
   ids.forEach(dropdownId=>{
     const select=document.getElementById(dropdownId);
@@ -1503,6 +2055,8 @@ function renderAll(){
   renderDashboard();
   renderFixtures();
   updateTeamGroupSelect();
+  updateSquadTeamSelect();
+  renderStats();
 
   const matchTournament=document.getElementById("matchTournament");
   if(matchTournament && matchTournament.value){
@@ -1583,6 +2137,7 @@ function renderTeams(){
       div.innerHTML=`
         <strong>${esc(team.name)}</strong> ${team.group ? '<span class="badge">GROUP '+esc(team.group)+'</span>' : ""}
         <button class="danger small" style="float:right" onclick="deleteTeam('${t.id}','${team.id}')">Delete</button>
+        ${chipsHTML(t,team)}
       `;
       box.appendChild(div);
     });
@@ -1605,7 +2160,7 @@ function matchHTML(t,m){
       <strong>${esc(nameA)}</strong> ${sc(m.ra,m.wa,m.oa)}<br>
       <strong>${esc(nameB)}</strong> ${sc(m.rb,m.wb,m.ob)}
     </p>
-    <p class="success">${esc(result)} ${m.stage==="ko" ? '<span class="badge">KNOCKOUT</span>' : ""}</p>`;
+    <p class="success">${esc(result)} ${m.stage==="ko" ? '<span class="badge">KNOCKOUT</span>' : ""}</p>${cardHTML(t,m)}`;
 }
 
 /* RENDER MATCHES */
@@ -1624,6 +2179,7 @@ function renderMatches(){
       div.innerHTML=
         `<strong>${esc(t.name)}</strong>`+
         matchHTML(t,m)+
+        `<button class="small secondary" onclick="openScorecard('${t.id}','${m.id}')">${m.card ? "Edit scorecard" : "Add scorecard"}</button>`+
         `<button class="danger small" onclick="deleteMatch('${t.id}','${m.id}')">Delete</button>`;
 
       box.appendChild(div);
@@ -1707,6 +2263,10 @@ function renderPublic(t){
   });
 
   document.getElementById("publicPoints").innerHTML=pointsTablesHTML(t);
+
+  const hasCards=(t.matches || []).some(m=>m.card);
+  document.getElementById("publicStatsCard").classList.toggle("hidden",!hasCards);
+  if(hasCards)refreshStats("publicStats");
 }
 
 /* CREATE YOUR OWN */
