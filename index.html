@@ -152,6 +152,13 @@ textarea:focus{outline:none;border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,19
 .cap span{color:var(--cc,#f59e0b);font-weight:700}
 .stat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 table.wide{min-width:760px}
+.stats-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:8px 0}
+.player-link{background:none!important;color:#7dd3fc!important;padding:2px 0!important;min-height:0!important;text-align:left;text-decoration:underline;font-weight:600}
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0}
+.profile-stat{background:#16263c;border:1px solid #2a3f5c;border-radius:10px;padding:10px}
+.profile-stat small{display:block;color:#b4c0d0}.profile-stat strong{font-size:20px;color:#f472b6}
+.stats-note{font-size:13px;color:#b4c0d0;margin:8px 0}
+
 table.mini{min-width:0;font-size:14px;margin-top:6px}
 table.mini th,table.mini td{padding:6px 4px}
 th.sortable{cursor:pointer;white-space:nowrap}
@@ -259,7 +266,7 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
   <button id="navFixtures" onclick="showSection('fixtures')">Fixtures</button>
   <button id="navMatches" onclick="showSection('matches')">Match Scoring</button>
   <button id="navPoints" onclick="showSection('points')">Points Table</button>
-  <button id="navStats" onclick="showSection('stats')">Stats</button>
+  <button id="navStats" onclick="showSection('stats')">Player Stats</button>
   <button onclick="logout()">Logout</button>
 </nav>
 
@@ -415,8 +422,14 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
 <section id="stats" class="section hidden">
   <div class="card">
     <h2>📈 Player Stats</h2>
+    <label class="muted">Tournament (statistics are isolated per tournament)</label>
     <select id="statsTournament" onchange="renderStats()"><option value="">Choose Tournament</option></select>
+    <div class="stats-filters">
+      <input id="statsSearch" type="search" placeholder="Search player name..." oninput="renderStats()" aria-label="Search players">
+      <select id="statsTeamFilter" onchange="renderStats()" aria-label="Filter by team"><option value="">All teams</option></select>
+    </div>
     <div id="statsWrap"></div>
+    <div id="statsProfile" class="hidden"></div>
   </div>
 </section>
 
@@ -474,7 +487,7 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
 
     <div class="card hidden" id="publicStatsCard">
       <h2>📈 Player Stats</h2>
-      <div id="publicStats"></div>
+      <div id="publicStats"></div><div id="publicStatsProfile" class="hidden"></div>
     </div>
 
     <div class="card" style="text-align:center">
@@ -1282,7 +1295,7 @@ function scRowHTML(kind,t,tid,e){
       '<div><small>Status</small><select data-f="out"><option value="0"'+(e && e.out ? "" : " selected")+'>Not out</option><option value="1"'+(e && e.out ? " selected" : "")+">Out</option></select></div>";
   }else if(kind==="bowl"){
     const ov=e ? Math.floor(e.bl/6)+"."+(e.bl%6) : "";
-    grid=inp("o","Overs",ov,"0.1")+inp("m","Maidens",e && e.m)+inp("r","Runs",e && e.r)+inp("w","Wickets",e && e.w);
+    grid=inp("o","Overs",ov,"0.1")+inp("m","Maidens",e && e.m)+inp("r","Runs conceded",e && e.r)+inp("w","Bowler wickets",e && e.w);
   }else{
     grid=inp("c","Catches",e && e.c)+inp("ro","Run-outs",e && e.ro)+inp("st","Stumpings",e && e.st);
   }
@@ -1354,6 +1367,7 @@ window.openScorecard=function(tournamentId,matchId){
     html+=`
       <div class="card">
         <h2>${esc(tm.name)} – Batting</h2>
+        <p class="stats-note">Enter each batter’s runs and balls faced from the scorecard. Team totals alone cannot produce individual player statistics.</p>
         <p class="muted" id="sce-${tm.id}"></p>
         ${hasSquad ? "" : '<p class="warning">Add players to this team in Teams → Squad first.</p>'}
         <div id="scb-${tm.id}"></div>
@@ -1362,6 +1376,7 @@ window.openScorecard=function(tournamentId,matchId){
       </div>
       <div class="card">
         <h2>${esc(tm.name)} – Bowling</h2>
+        <p class="stats-note">Enter bowler-conceded runs (include wides/no-balls; exclude byes/leg-byes/penalty runs) and only wickets credited to the bowler. Do not include run-outs or other non-bowler dismissals.</p>
         <div id="scw-${tm.id}"></div>
         ${hasSquad ? `<button class="small" onclick="scAddRow('bowl','${tm.id}')">+ Add bowler</button>` : ""}
         <details class="sc">
@@ -1433,10 +1448,12 @@ window.saveScorecard=async function(){
       if(f+sx>b)return fail(player.name+": 4s + 6s cannot be more than balls faced.");
       card.bat.push({p:pid,n:player.name,t:tid,r:r,b:b,f:f,s:sx,out:row.querySelector('[data-f="out"]').value==="1"});
     }else if(kind==="bowl"){
-      const ov=num("o");
-      const whole=Math.floor(ov);
-      const frac=Math.round((ov-whole)*10);
-      if(!(ov>0) || frac>5)return fail(player.name+": enter valid overs (for example 3.2; 3.6 does not exist).");
+      const ovText=row.querySelector('[data-f="o"]').value.trim();
+      const ov=Number(ovText);
+      const ovMatch=ovText.match(/^(\d+)(?:\.(\d))?$/);
+      const whole=ovMatch ? Number(ovMatch[1]) : -1;
+      const frac=ovMatch && ovMatch[2]!==undefined ? Number(ovMatch[2]) : 0;
+      if(!ovMatch || !(ov>0) || frac>5)return fail(player.name+": enter valid cricket overs (for example 3.2; 3.6 or 3.25 does not exist).");
       if(!ints(["m","r","w"]))return fail(player.name+": maidens, runs and wickets must be whole numbers.");
       if(num("m")>whole)return fail(player.name+": maidens cannot be more than the overs bowled.");
       if(num("w")>10)return fail(player.name+": wickets cannot be more than 10.");
@@ -1512,69 +1529,59 @@ function cardHTML(t,m){
 /* ---------- stats ---------- */
 
 function calcStats(t){
-  const pl={};
-  const tn={};
+  const pl={},tn={};
   (t.teams || []).forEach(tm=>{
     tn[tm.id]=tm.name;
-    (tm.players || []).forEach(p=>{pl[p.id]={name:p.name,team:tm.name};});
+    (tm.players || []).forEach(p=>{pl[p.id]={name:p.name,team:tm.name,teamId:tm.id};});
   });
-  const info=e=>({name:(pl[e.p] && pl[e.p].name) || e.n || "?",team:(pl[e.p] && pl[e.p].team) || tn[e.t] || ""});
-
-  const bat={},bowl={},field={};
-
-  (t.matches || []).forEach(m=>{
-    const c=m.card;
-    if(!c)return;
-
+  const info=e=>({name:(pl[e.p] && pl[e.p].name) || e.n || "?",team:(pl[e.p] && pl[e.p].team) || tn[e.t] || "",teamId:(pl[e.p] && pl[e.p].teamId) || e.t || ""});
+  const bat={},bowl={},field={},performance={};
+  const ensurePerf=(e,m)=>{
+    const key=e.p;
+    const p=performance[key] || (performance[key]={id:key,...info(e),matches:[]});
+    let row=p.matches.find(x=>x.matchId===m.id);
+    if(!row){row={matchId:m.id,matchLabel:m.label || ("Match "+(p.matches.length+1)),runs:0,balls:0,wickets:0,oversBalls:0,notOut:false};p.matches.push(row);}
+    return row;
+  };
+  (t.matches || []).forEach((m,mi)=>{
+    const c=m.card;if(!c)return;
+    const matchLabel=(tn[m.a]||"Team A")+" vs "+(tn[m.b]||"Team B");
     (c.bat || []).forEach(e=>{
       const s=bat[e.p] || (bat[e.p]={id:e.p,...info(e),ms:new Set(),inns:0,no:0,runs:0,balls:0,fours:0,sixes:0,fifties:0,hundreds:0,ducks:0,hsr:-1,hsno:false});
-      s.ms.add(m.id);
-      s.inns++;
-      if(!e.out)s.no++;
-      s.runs+=e.r; s.balls+=e.b; s.fours+=e.f; s.sixes+=e.s;
-      if(e.r>=100)s.hundreds++; else if(e.r>=50)s.fifties++;
+      s.ms.add(m.id);s.inns++;if(!e.out)s.no++;
+      s.runs+=Number(e.r)||0;s.balls+=Number(e.b)||0;s.fours+=Number(e.f)||0;s.sixes+=Number(e.s)||0;
+      if(e.r>=100)s.hundreds++;else if(e.r>=50)s.fifties++;
       if(e.out && e.r===0)s.ducks++;
       if(e.r>s.hsr || (e.r===s.hsr && !e.out && !s.hsno)){s.hsr=e.r;s.hsno=!e.out;}
+      const pr=ensurePerf(e,{...m,label:matchLabel});pr.runs+=Number(e.r)||0;pr.balls+=Number(e.b)||0;pr.notOut=!e.out;
     });
-
     (c.bowl || []).forEach(e=>{
-      const s=bowl[e.p] || (bowl[e.p]={id:e.p,...info(e),ms:new Set(),balls:0,maidens:0,runs:0,wkts:0,bw:-1,br:0,w3:0,w5:0});
-      s.ms.add(m.id);
-      s.balls+=e.bl; s.maidens+=e.m; s.runs+=e.r; s.wkts+=e.w;
-      if(e.w>=5)s.w5++; else if(e.w>=3)s.w3++;
+      const s=bowl[e.p] || (bowl[e.p]={id:e.p,...info(e),ms:new Set(),inns:0,balls:0,maidens:0,runs:0,wkts:0,bw:-1,br:0,w3:0,w4:0,w5:0,w10:0});
+      s.ms.add(m.id);s.inns++;s.balls+=Number(e.bl)||0;s.maidens+=Number(e.m)||0;s.runs+=Number(e.r)||0;s.wkts+=Number(e.w)||0;
+      if(e.w>=10)s.w10++;if(e.w>=5)s.w5++;else if(e.w>=4)s.w4++;else if(e.w>=3)s.w3++;
       if(e.w>s.bw || (e.w===s.bw && e.r<s.br)){s.bw=e.w;s.br=e.r;}
+      const pr=ensurePerf(e,{...m,label:matchLabel});pr.wickets+=Number(e.w)||0;pr.oversBalls+=Number(e.bl)||0;
     });
-
     (c.field || []).forEach(e=>{
       const s=field[e.p] || (field[e.p]={id:e.p,...info(e),ms:new Set(),catches:0,ro:0,st:0,potm:0});
-      s.ms.add(m.id);
-      s.catches+=e.c; s.ro+=e.ro; s.st+=e.st;
+      s.ms.add(m.id);s.catches+=Number(e.c)||0;s.ro+=Number(e.ro)||0;s.st+=Number(e.st)||0;
     });
-
-    if(c.pom){
-      const s=field[c.pom] || (field[c.pom]={id:c.pom,...info({p:c.pom,n:c.pomN,t:c.pomT}),ms:new Set(),catches:0,ro:0,st:0,potm:0});
-      s.ms.add(m.id);
-      s.potm++;
-    }
+    if(c.pom){const s=field[c.pom] || (field[c.pom]={id:c.pom,...info({p:c.pom,n:c.pomN,t:c.pomT}),ms:new Set(),catches:0,ro:0,st:0,potm:0});s.ms.add(m.id);s.potm++;}
   });
-
-  return {
-    bat:Object.values(bat).map(s=>({...s,mat:s.ms.size,hs:s.hsr+(s.hsno ? "*" : ""),
-      avg:(s.inns-s.no)>0 ? s.runs/(s.inns-s.no) : null,
-      sr:s.balls>0 ? s.runs*100/s.balls : null})),
-    bowl:Object.values(bowl).map(s=>({...s,mat:s.ms.size,
-      overs:Math.floor(s.balls/6)+"."+(s.balls%6),
-      econ:s.balls>0 ? s.runs*6/s.balls : null,
-      bavg:s.wkts>0 ? s.runs/s.wkts : null,
-      bsr:s.wkts>0 ? s.balls/s.wkts : null,
-      best:s.bw>=0 ? s.bw+"/"+s.br : "-"})),
-    field:Object.values(field).map(s=>({...s,mat:s.ms.size,total:s.catches+s.ro+s.st}))
+  const out={
+    bat:Object.values(bat).map(s=>({...s,mat:s.ms.size,hs:s.hsr+(s.hsno?"*":""),avg:(s.inns-s.no)>0?s.runs/(s.inns-s.no):null,sr:s.balls>0?s.runs*100/s.balls:null})),
+    bowl:Object.values(bowl).map(s=>({...s,mat:s.ms.size,overs:Math.floor(s.balls/6)+"."+(s.balls%6),econ:s.balls>0?s.runs*6/s.balls:null,bavg:s.wkts>0?s.runs/s.wkts:null,bsr:s.wkts>0?s.balls/s.wkts:null,best:s.bw>=0?s.bw+"/"+s.br:"-"})),
+    field:Object.values(field).map(s=>({...s,mat:s.ms.size,total:s.catches+s.ro+s.st})),
+    performance:Object.values(performance).map(p=>({...p,matches:p.matches.sort((a,b)=>(t.matches||[]).findIndex(m=>m.id===a.matchId)-(t.matches||[]).findIndex(m=>m.id===b.matchId))}))
   };
+  const playerIds=new Set([...out.bat.map(x=>x.id),...out.bowl.map(x=>x.id)]);
+  out.allround=[...playerIds].map(pid=>{const b=out.bat.find(x=>x.id===pid),bw=out.bowl.find(x=>x.id===pid),base=b||bw;return {...base,runs:b?b.runs:0,avg:b?b.avg:null,wkts:bw?bw.wkts:0,econ:bw?bw.econ:null,bavg:bw?bw.bavg:null};}).filter(x=>x.runs>0 || x.wkts>0);
+  return out;
 }
 
 const STAT_COLS={
   bat:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["inns","Inn","inns"],["runs","Runs","runs"],["hs","HS","hsr"],["avg","Avg","avg"],["sr","SR","sr"],["fours","4s","fours"],["sixes","6s","sixes"],["fifties","50","fifties"],["hundreds","100","hundreds"],["no","NO","no"]],
-  bowl:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["overs","O","balls"],["maidens","Mdn","maidens"],["runs","Runs","runs"],["wkts","Wkts","wkts"],["bavg","Avg","bavg"],["econ","Econ","econ"],["bsr","SR","bsr"],["best","Best","bw"],["w3","3W","w3"],["w5","5W","w5"]],
+  bowl:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["inns","Inn","inns"],["overs","O","balls"],["maidens","Mdn","maidens"],["runs","Runs","runs"],["wkts","Wkts","wkts"],["bavg","Avg","bavg"],["econ","Econ","econ"],["bsr","SR","bsr"],["best","Best","bw"],["w3","3W","w3"],["w4","4W","w4"],["w5","5W","w5"],["w10","10W","w10"]],
   field:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["catches","Ct","catches"],["ro","RO","ro"],["st","St","st"],["total","Total","total"],["potm","POTM","potm"]]
 };
 const LOWER_BETTER=["bavg","econ","bsr"];
@@ -1582,6 +1589,7 @@ const LOWER_BETTER=["bavg","econ","bsr"];
 function sortRows(rows,key){
   const lower=LOWER_BETTER.includes(key);
   return [...rows].sort((a,b)=>{
+    if(key==="best")return (Number(b.bw)||0)-(Number(a.bw)||0)||(Number(a.br)||0)-(Number(b.br)||0);
     const x=a[key],y=b[key];
     if((x===null || x===undefined) && (y===null || y===undefined))return 0;
     if(x===null || x===undefined)return 1;
@@ -1597,52 +1605,46 @@ function capCard(label,color,row,value){
 }
 
 function statsHTML(cid,t){
-  const st=statsState[cid] || (statsState[cid]={tab:"bat",sort:{bat:"runs",bowl:"wkts",field:"total"}});
+  const st=statsState[cid] || (statsState[cid]={tab:"bat",sort:{bat:"runs",bowl:"wkts",field:"total",allround:"runs"}});
   const s=calcStats(t);
-
-  if(!s.bat.length && !s.bowl.length && !s.field.length){
-    return '<p class="muted">No scorecards yet. Go to Match Scoring and tap "Add scorecard" on a match.</p>';
-  }
-
-  const maxBy=(arr,key,filter)=>sortRows(arr.filter(filter || (()=>true)),key)[0];
-  const orange=maxBy(s.bat,"runs",x=>x.runs>0);
-  const purple=[...s.bowl].filter(x=>x.wkts>0).sort((a,b)=>b.wkts-a.wkts || a.runs-b.runs)[0];
-  const bestSr=maxBy(s.bat,"sr",x=>x.balls>=10);
-  const bestEco=maxBy(s.bowl,"econ",x=>x.balls>=12);
-  const sixes=maxBy(s.bat,"sixes",x=>x.sixes>0);
-  const hs=maxBy(s.bat,"hsr",x=>x.hsr>0);
-
-  let html='<div class="caps">'+
-    capCard("🟠 Orange Cap","#f59e0b",orange,orange && orange.runs+" runs")+
-    capCard("🟣 Purple Cap","#a78bfa",purple,purple && purple.wkts+" wkts")+
-    capCard("⚡ Best Strike Rate","#22c55e",bestSr,bestSr && bestSr.sr.toFixed(1))+
-    capCard("🎯 Best Economy","#38bdf8",bestEco,bestEco && bestEco.econ.toFixed(2))+
-    capCard("💥 Most Sixes","#fb7185",sixes,sixes && sixes.sixes+" sixes")+
-    capCard("🏏 Highest Score","#2dd4bf",hs,hs && hs.hs)+
-    "</div>";
-
-  const tabs=[["bat","Batting"],["bowl","Bowling"],["field","Fielding"]];
-  html+='<div class="stat-tabs">'+tabs.map(x=>
-    '<button class="small '+(st.tab===x[0] ? "" : "gray")+'" onclick="statsTab(\''+cid+'\',\''+x[0]+'\')">'+x[1]+"</button>").join("")+"</div>";
-
-  const cols=STAT_COLS[st.tab];
-  const sortKey=st.sort[st.tab];
-  const rows=sortRows(s[st.tab],sortKey);
-
-  html+='<div class="table-wrap"><table class="wide"><thead><tr>'+
-    cols.map(c=>'<th class="sortable'+(c[2]===sortKey ? " sorted" : "")+'" onclick="statsSort(\''+cid+'\',\''+c[2]+'\')">'+c[1]+"</th>").join("")+
-    "</tr></thead><tbody>"+
-    rows.map(r=>"<tr>"+cols.map(c=>{
-      let v=r[c[0]];
-      if(v===null || v===undefined)v="-";
-      else if(typeof v==="number" && !Number.isInteger(v))v=v.toFixed(2);
-      return "<td>"+esc(v)+"</td>";
-    }).join("")+"</tr>").join("")+
-    "</tbody></table></div>"+
-    '<p class="muted">Tap a column heading to sort. * = not out. Avg and SR are blank until they can be worked out.</p>';
-
+  if(!s.bat.length && !s.bowl.length && !s.field.length)return '<p class="muted">No scorecards yet. Open Match Scoring and tap “Add scorecard”. Individual player statistics are never guessed from team totals.</p>';
+  const search=(cid==="publicStats"?"":(document.getElementById("statsSearch")?.value||"")).trim().toLowerCase();
+  const teamFilter=cid==="publicStats"?"":(document.getElementById("statsTeamFilter")?.value||"");
+  const allowed=r=>(!teamFilter||r.teamId===teamFilter)&&(!search||r.name.toLowerCase().includes(search));
+  const maxBy=(arr,key,filter)=>sortRows(arr.filter(x=>allowed(x)&&(filter||(()=>true))(x)),key)[0];
+  const orange=maxBy(s.bat,"runs",x=>x.runs>0),purple=[...s.bowl].filter(x=>allowed(x)&&x.wkts>0).sort((a,b)=>b.wkts-a.wkts||a.runs-b.runs)[0];
+  const bestSr=maxBy(s.bat,"sr",x=>x.balls>=10),bestEco=maxBy(s.bowl,"econ",x=>x.balls>=12),sixes=maxBy(s.bat,"sixes",x=>x.sixes>0),hs=maxBy(s.bat,"hsr",x=>x.hsr>0);
+  let html='<div class="caps">'+capCard("🟠 Most Runs","#f59e0b",orange,orange&&orange.runs+" runs")+capCard("🟣 Most Wickets","#a78bfa",purple,purple&&purple.wkts+" wickets")+capCard("⚡ Best Strike Rate (10+ balls)","#22c55e",bestSr,bestSr&&bestSr.sr.toFixed(1))+capCard("🎯 Best Economy (12+ balls)","#38bdf8",bestEco,bestEco&&bestEco.econ.toFixed(2))+capCard("💥 Most Sixes","#fb7185",sixes,sixes&&sixes.sixes+" sixes")+capCard("🏏 Highest Score","#2dd4bf",hs,hs&&hs.hs)+"</div>";
+  const tabs=[["bat","Batting"],["bowl","Bowling"],["field","Fielding"],["allround","All-rounders"]];
+  html+='<div class="stat-tabs">'+tabs.map(x=>'<button class="small '+(st.tab===x[0]?"":"gray")+'" onclick="statsTab(\''+cid+'\',\''+x[0]+'\')">'+x[1]+'</button>').join("")+"</div>";
+  let rows=[],cols=STAT_COLS[st.tab];
+  if(st.tab==="allround"){
+    cols=[["name","Player","name"],["team","Team","team"],["runs","Runs","runs"],["wkts","Wkts","wkts"],["avg","Bat Avg","avg"],["econ","Bowl Econ","econ"]];
+    rows=s.allround.filter(allowed);
+  }else rows=(s[st.tab]||[]).filter(allowed);
+  const sortKey=st.sort[st.tab]|| (st.tab==="allround"?"runs":cols[0][2]);
+  rows=sortRows(rows,sortKey);
+  html+='<div class="table-wrap"><table class="wide"><thead><tr>'+cols.map(c=>'<th class="sortable'+(c[2]===sortKey?" sorted":"")+'" onclick="statsSort(\''+cid+'\',\''+c[2]+'\')">'+c[1]+'</th>').join("")+'</tr></thead><tbody>'+
+    rows.map(r=>'<tr>'+cols.map(c=>{let v=r[c[0]];if(c[0]==="name")return '<td><button class="player-link" onclick="openPlayerProfile(\''+cid+'\',\''+r.id+'\')">'+esc(v)+'</button></td>';if(v===null||v===undefined||v==="")v="-";else if(typeof v==="number"&&!Number.isInteger(v))v=v.toFixed(2);return '<td>'+esc(v)+'</td>';}).join("")+'</tr>').join("")+'</tbody></table></div>'+
+    '<p class="stats-note">Tap a column heading to sort and a player name to open their profile. Overs are stored as legal balls (e.g. 3.4 = 22 balls). Bowling average/economy/strike-rate leaderboards use 12+ legal balls; batting strike rate uses 10+ balls. Bowling wickets must be entered as wickets credited to the bowler; run-outs and other non-bowler dismissals must not be included. All statistics are recalculated from saved scorecards, so editing or deleting a match changes the totals automatically.</p>';
   return html;
 }
+
+window.openPlayerProfile=function(cid,pid){
+  const t=statsTournamentFor(cid);if(!t)return;
+  const s=calcStats(t);const b=s.bat.find(x=>x.id===pid),w=s.bowl.find(x=>x.id===pid),f=s.field.find(x=>x.id===pid),p=s.performance.find(x=>x.id===pid);
+  const base=b||w||f||p;if(!base)return;
+  const profile=document.getElementById(cid==="publicStats"?"publicStatsProfile":"statsProfile");if(!profile)return;
+  const fmt=(v,d=2)=>v===null||v===undefined?"-":typeof v==="number"?v.toFixed(d):v;
+  const tile=(label,value)=>'<div class="profile-stat"><small>'+label+'</small><strong>'+esc(value)+'</strong></div>';
+  let html='<div class="card"><h2>👤 '+esc(base.name)+' — Player Profile</h2><p class="muted">'+esc(base.team||"")+' • '+esc(t.name||"Tournament")+'</p><button class="small gray" onclick="closePlayerProfile(\''+cid+'\')">Close profile</button><div class="profile-grid">'+tile("Matches Batted",b?b.mat:0)+tile("Runs",b?b.runs:0)+tile("Batting Average",b?fmt(b.avg):"-")+tile("Strike Rate",b?fmt(b.sr):"-")+tile("Highest Score",b?b.hs:"-")+tile("50s / 100s",b?(b.fifties+" / "+b.hundreds):"-")+tile("Wickets",w?w.wkts:0)+tile("Bowling Figures",w?w.best:"-")+tile("Bowling Average",w?fmt(w.bavg):"-")+tile("Economy",w?fmt(w.econ):"-")+tile("3W / 4W / 5W / 10W",w?([w.w3,w.w4,w.w5,w.w10].join(" / ")):"-")+'</div><h3>Match-by-match performance</h3>';
+  const matches=(p&&p.matches)||[];
+  if(!matches.length)html+='<p class="muted">No individual scorecard performances recorded for this player yet.</p>';
+  else html+='<div class="table-wrap"><table class="wide"><thead><tr><th>Match</th><th>Runs</th><th>Balls</th><th>Wickets</th><th>Bowling Overs</th></tr></thead><tbody>'+matches.map(m=>'<tr><td>'+esc(m.matchLabel)+'</td><td>'+m.runs+(m.notOut?'*':'')+'</td><td>'+m.balls+'</td><td>'+m.wickets+'</td><td>'+Math.floor(m.oversBalls/6)+'.'+(m.oversBalls%6)+'</td></tr>').join('')+'</tbody></table></div>';
+  const recent=matches.slice(-5);html+='<h3>Recent form (last '+recent.length+' scorecarded matches)</h3><div class="profile-grid">'+tile("Runs",recent.reduce((a,x)=>a+x.runs,0))+tile("Wickets",recent.reduce((a,x)=>a+x.wickets,0))+tile("Average runs/match",recent.length?fmt(recent.reduce((a,x)=>a+x.runs,0)/recent.length):"-")+'</div></div>';
+  profile.innerHTML=html;profile.classList.remove("hidden");profile.scrollIntoView({behavior:"smooth",block:"start"});
+};
+window.closePlayerProfile=function(cid){const el=document.getElementById(cid==="publicStats"?"publicStatsProfile":"statsProfile");if(el){el.classList.add("hidden");el.innerHTML="";}};
 
 function statsTournamentFor(cid){
   if(cid==="publicStats")return publicTournament;
@@ -1657,6 +1659,9 @@ function refreshStats(cid){
 }
 
 window.renderStats=function(){
+  const sel=document.getElementById("statsTeamFilter");
+  const tid=document.getElementById("statsTournament")?.value||"";
+  if(sel){const old=sel.value;sel.innerHTML='<option value="">All teams</option>';const t=tournaments.find(x=>x.id===tid);(t?.teams||[]).forEach(tm=>{const o=document.createElement("option");o.value=tm.id;o.textContent=tm.name;sel.appendChild(o);});if([...sel.options].some(o=>o.value===old))sel.value=old;}
   refreshStats("statsWrap");
 };
 
