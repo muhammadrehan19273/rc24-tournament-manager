@@ -151,6 +151,38 @@ button.small,.linkbtn{font-size:14px}
 @keyframes tlRoad{from{transform:translateX(0)}to{transform:translateX(-22px)}}
 @keyframes tlLine{from{transform:translateX(8px);opacity:0}30%{opacity:.7}to{transform:translateX(-14px);opacity:0}}
 @media (prefers-reduced-motion:reduce){.tl-wheel,.tl-truck,.tl-dash,.tl-speed i{animation:none}}
+
+/* ---------- sidebar menu ---------- */
+#topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(8,18,32,.92);backdrop-filter:blur(12px);border-bottom:1px solid #1b3550}
+#topbar #menuBtn{flex:0 0 auto;width:44px;min-height:40px;height:40px;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:12px;background:#10223a;border:1px solid #23415f;box-shadow:none}
+#topbar #menuBtn::before{display:none}
+#menuBtn span{display:block;width:20px;height:2.5px;border-radius:2px;background:#e2e8f0;transition:transform .25s,opacity .25s}
+#menuBtn.open span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+#menuBtn.open span:nth-child(2){opacity:0}
+#menuBtn.open span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+#topTitle{flex:1;font-size:18px;font-weight:800;color:#f1f5f9;letter-spacing:.02em}
+.tb-brand{font-size:13px;font-weight:700;color:#7dd3fc;letter-spacing:.12em}
+#navOverlay{position:fixed;inset:0;z-index:150;background:rgba(2,6,14,.62);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s}
+#navOverlay.open{opacity:1;pointer-events:auto}
+nav#sideNav{position:fixed;top:0;left:0;bottom:0;z-index:200;width:min(80vw,300px);display:flex;flex-direction:column;flex-wrap:nowrap;gap:6px;overflow-x:hidden;overflow-y:auto;padding:18px 14px;background:linear-gradient(180deg,#0b1a2e,#060f1c);border:0;border-right:1px solid #1f3d5c;border-radius:0 24px 24px 0;box-shadow:14px 0 44px rgba(0,0,0,.6);backdrop-filter:none;transform:translateX(-108%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s .32s}
+nav#sideNav.open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s}
+.sn-logo{display:flex;align-items:center;gap:12px;padding:4px 6px 16px}
+.sn-logo-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,#22d3ee,#38bdf8);box-shadow:0 0 18px rgba(34,211,238,.45)}
+.sn-logo b{font-size:19px;color:#fff;line-height:1.1}
+.sn-logo em{display:block;font-style:normal;font-size:11px;font-weight:600;letter-spacing:.14em;color:#7dd3fc;margin-top:2px}
+#sideNav button{display:flex;align-items:center;justify-content:flex-start;gap:14px;width:100%;flex:0 0 auto;text-align:left;padding:12px 14px;min-height:48px;border-radius:14px;background:transparent;border:1px solid transparent;color:#cbd5e1;font-size:15px;font-weight:600;box-shadow:none;transform:none;transition:background .2s,color .2s,box-shadow .2s}
+#sideNav button::before{display:none}
+#sideNav button:active{transform:scale(.97);box-shadow:none}
+#sideNav button .ni{width:24px;text-align:center;font-size:18px;filter:grayscale(.2)}
+#sideNav button.active{background:var(--ac,#22d3ee);color:#04121f;box-shadow:0 6px 22px color-mix(in srgb,var(--ac,#22d3ee) 45%,transparent);transform:none}
+.sn-spacer{flex:1;min-height:14px}
+.sn-user{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid #1f6f8b;border-radius:14px;background:rgba(14,40,64,.55)}
+.sn-avatar{flex:0 0 38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#1e1b4b;background:#a78bfa}
+.sn-who{min-width:0}
+.sn-who b{display:block;font-size:14px;color:#fff}
+.sn-who small{display:block;font-size:12px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sideNav .sn-logout{margin-top:4px;color:#fca5a5;border-color:#4b2230}
+@media (prefers-reduced-motion:reduce){nav#sideNav,#navOverlay{transition:none}}
 /* ---------- animated login ---------- */
 .auth-stage{max-width:450px;margin:8px auto 0;perspective:700px}
 .auth-stage .auth-box{margin:0 auto}
@@ -402,15 +434,24 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
 <!-- APP -->
 <div id="appScreen" class="hidden">
 
-<nav>
-  <button id="navDashboard" onclick="showSection('dashboard')">Dashboard</button>
-  <button id="navTournaments" onclick="showSection('tournaments')">Tournaments</button>
-  <button id="navTeams" onclick="showSection('teams')">Teams</button>
-  <button id="navFixtures" onclick="showSection('fixtures')">Fixtures</button>
-  <button id="navMatches" onclick="showSection('matches')">Match Scoring</button>
-  <button id="navPoints" onclick="showSection('points')">Points Table</button>
-  <button id="navStats" onclick="showSection('stats')">Player Stats</button>
-  <button onclick="logout()">Logout</button>
+<div id="topbar">
+  <button id="menuBtn" type="button" onclick="toggleMenu()" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  <div id="topTitle">Dashboard</div>
+  <div class="tb-brand">🏏 RC24</div>
+</div>
+<div id="navOverlay" onclick="closeMenu()"></div>
+<nav id="sideNav" aria-label="Main menu">
+  <div class="sn-logo"><span class="sn-logo-icon">🏏</span><b>RC24 <em>Tournaments</em></b></div>
+  <button id="navDashboard" onclick="showSection('dashboard')"><span class="ni">🏠</span><span class="nl">Dashboard</span></button>
+  <button id="navTournaments" onclick="showSection('tournaments')"><span class="ni">🏆</span><span class="nl">Tournaments</span></button>
+  <button id="navTeams" onclick="showSection('teams')"><span class="ni">👥</span><span class="nl">Teams</span></button>
+  <button id="navFixtures" onclick="showSection('fixtures')"><span class="ni">📅</span><span class="nl">Fixtures</span></button>
+  <button id="navMatches" onclick="showSection('matches')"><span class="ni">🏏</span><span class="nl">Match Scoring</span></button>
+  <button id="navPoints" onclick="showSection('points')"><span class="ni">📊</span><span class="nl">Points Table</span></button>
+  <button id="navStats" onclick="showSection('stats')"><span class="ni">📈</span><span class="nl">Player Stats</span></button>
+  <div class="sn-spacer"></div>
+  <div class="sn-user"><div class="sn-avatar" id="snAvatar">A</div><div class="sn-who"><b>Organizer</b><small id="snEmail"></small></div></div>
+  <button class="sn-logout" onclick="logout()"><span class="ni">🚪</span><span class="nl">Logout</span></button>
 </nav>
 
 <div class="container">
@@ -772,6 +813,8 @@ onAuthStateChanged(auth, async user=>{
     document.getElementById("appScreen").classList.remove("hidden");
     document.getElementById("publicScreen").classList.add("hidden");
     document.getElementById("userEmail").textContent=user.email || "";
+    const se=document.getElementById("snEmail");if(se)se.textContent=user.email || "";
+    const sa=document.getElementById("snAvatar");if(sa)sa.textContent=((user.email||"A")[0]||"A").toUpperCase();
     await loadTournaments();
     showSection("dashboard");
   }else{
@@ -1724,6 +1767,19 @@ function scramble(el){
 }
 
 /* NAVIGATION */
+window.toggleMenu=function(){
+  const open=!document.getElementById("sideNav").classList.contains("open");
+  document.getElementById("sideNav").classList.toggle("open",open);
+  document.getElementById("navOverlay").classList.toggle("open",open);
+  const b=document.getElementById("menuBtn");b.classList.toggle("open",open);b.setAttribute("aria-expanded",open?"true":"false");
+  document.body.style.overflow=open?"hidden":"";
+};
+window.closeMenu=function(){
+  const n=document.getElementById("sideNav");
+  if(n && n.classList.contains("open"))toggleMenu();
+};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeMenu();});
+
 window.showSection=function(section){
   document.querySelectorAll(".section").forEach(x=>x.classList.add("hidden"));
   const target=document.getElementById(section);
@@ -1733,8 +1789,11 @@ window.showSection=function(section){
   const nav=document.getElementById("nav"+section.charAt(0).toUpperCase()+section.slice(1));
   if(nav){
     nav.classList.add("active");
-    nav.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
+    const lbl=nav.querySelector(".nl");
+    const tt=document.getElementById("topTitle");
+    if(lbl && tt)tt.textContent=lbl.textContent;
   }
+  closeMenu();
 
   renderAll();
 
