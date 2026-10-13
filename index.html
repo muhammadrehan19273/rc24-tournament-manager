@@ -508,9 +508,9 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
       <option value="">Choose Tournament</option>
     </select>
     <label class="muted">Team A</label>
-    <select id="matchTeamA"><option value="">Choose Team A</option></select>
+    <select id="matchTeamA" onchange="updateResultLabels()"><option value="">Choose Team A</option></select>
     <label class="muted">Team B</label>
-    <select id="matchTeamB"><option value="">Choose Team B</option></select>
+    <select id="matchTeamB" onchange="updateResultLabels()"><option value="">Choose Team B</option></select>
 
     <input id="runsA" type="number" min="0" placeholder="Team A Runs">
     <input id="wicketsA" type="number" min="0" max="10" placeholder="Team A Wickets">
@@ -520,10 +520,12 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
     <input id="wicketsB" type="number" min="0" max="10" placeholder="Team B Wickets">
     <input id="oversB" type="number" min="0" step="0.1" placeholder="Team B Overs">
 
-    <select id="matchResult">
+    <select id="matchResult" onfocus="updateResultLabels()" onpointerdown="updateResultLabels()">
       <option value="normal">Normal Match</option>
       <option value="tie">Tie</option>
       <option value="noresult">No Result</option>
+      <option value="walkoverA">Match not played – Team A wins</option>
+      <option value="walkoverB">Match not played – Team B wins</option>
     </select>
     <label class="muted">If runs are level in a knockout match, winner:</label>
     <select id="matchTieWinner">
@@ -1360,7 +1362,7 @@ function calcStats(t){
   const bat={},bowl={},performance={};
 
   (t.matches || []).forEach(m=>{
-    if(m.type==="noresult" || !tn[m.a] || !tn[m.b])return;
+    if(isUnplayed(m.type) || !tn[m.a] || !tn[m.b])return;
     const label=tn[m.a]+" vs "+tn[m.b];
 
     [
@@ -1537,6 +1539,20 @@ function validateInnings(t,runs,wkts,overs,label){
   return "";
 }
 
+// Matches that were not played (no result / walkover): no runs, no NRR, no player stats.
+const isUnplayed=t=>t==="noresult" || t==="walkoverA" || t==="walkoverB";
+const isWalkover=t=>t==="walkoverA" || t==="walkoverB";
+
+window.updateResultLabels=function(){
+  const nm=sid=>{const el=document.getElementById(sid);const o=el&&el.options[el.selectedIndex];return o&&o.value?o.textContent.replace(/ \(Group .*\)$/,""):"";};
+  const a=nm("matchTeamA")||"Team A",b=nm("matchTeamB")||"Team B";
+  const sel=document.getElementById("matchResult");if(!sel)return;
+  [...sel.options].forEach(o=>{
+    if(o.value==="walkoverA")o.textContent="Match not played – "+a+" wins";
+    if(o.value==="walkoverB")o.textContent="Match not played – "+b+" wins";
+  });
+};
+
 window.addMatch=async function(){
   const tournamentId=document.getElementById("matchTournament").value;
   const a=document.getElementById("matchTeamA").value;
@@ -1565,7 +1581,7 @@ window.addMatch=async function(){
   const t=tournaments.find(x=>x.id===tournamentId);
   if(!t)return;
 
-  if(type!=="noresult"){
+  if(!isUnplayed(type)){
     const bad=validateInnings(t,ra,wa,oa,"Team A") || validateInnings(t,rb,wb,ob,"Team B");
     if(bad){
       msg("matchMsg",bad,"error");
@@ -1603,7 +1619,8 @@ window.addMatch=async function(){
       msg("matchMsg","A knockout match needs a result.","error");
       return;
     }
-    if(ra>rb)winner=a;
+    if(isWalkover(type))winner=type==="walkoverA" ? a : b;
+    else if(ra>rb)winner=a;
     else if(rb>ra)winner=b;
     else{
       const pick=document.getElementById("matchTieWinner").value;
@@ -1624,6 +1641,10 @@ window.addMatch=async function(){
     type:type,
     createdAt:Date.now()
   };
+  if(isWalkover(type)){
+    match.ra=0;match.rb=0;match.wa=0;match.wb=0;match.oa=0;match.ob=0;
+    match.winner=type==="walkoverA" ? a : b;
+  }
   if(isKo){
     match.stage="ko";
     match.winner=winner;
@@ -1834,6 +1855,14 @@ function calculatePoints(t,group){
     A.p++;
     B.p++;
 
+    // Walkover (match not played): winner gets 2 points, nothing counted for NRR.
+    if(m.type==="walkoverA" || m.type==="walkoverB"){
+      const winA=m.type==="walkoverA";
+      if(winA){A.w++;B.l++;A.pts+=2;}
+      else{B.w++;A.l++;B.pts+=2;}
+      return;
+    }
+
     // No-result: points awarded, nothing counted for NRR.
     if(m.type==="noresult"){
       A.nr++;B.nr++;
@@ -2001,12 +2030,13 @@ function renderTeams(){
 function matchHTML(t,m){
   const nameA=(t.teams || []).find(x=>x.id===m.a)?.name || "Team A";
   const nameB=(t.teams || []).find(x=>x.id===m.b)?.name || "Team B";
-  const sc=(r,w,o)=>m.type==="noresult" ? "-" : `${r}/${w || 0} (${o} ov)`;
+  const sc=(r,w,o)=>isUnplayed(m.type) ? "-" : `${r}/${w || 0} (${o} ov)`;
 
   let result="No result";
-  if(m.type==="tie" || (m.type!=="noresult" && m.ra===m.rb))result="Match tied";
+  if(isWalkover(m.type))result=(m.type==="walkoverA" ? nameA : nameB)+" won (match not played)";
+  else if(m.type==="tie" || (m.type!=="noresult" && m.ra===m.rb))result="Match tied";
   else if(m.type!=="noresult")result=(m.ra>m.rb ? nameA : nameB)+" won";
-  if(m.winner)result=(m.winner===m.a ? nameA : nameB)+" won"+(m.ra===m.rb ? " (tie-break)" : "");
+  if(m.winner && !isWalkover(m.type))result=(m.winner===m.a ? nameA : nameB)+" won"+(m.ra===m.rb ? " (tie-break)" : "");
 
   return `
     <p>
@@ -2116,7 +2146,7 @@ function renderPublic(t){
 
   document.getElementById("publicPoints").innerHTML=pointsTablesHTML(t);
 
-  const hasCards=(t.matches || []).some(m=>m.type!=="noresult");
+  const hasCards=(t.matches || []).some(m=>!isUnplayed(m.type));
   document.getElementById("publicStatsCard").classList.toggle("hidden",!hasCards);
   if(hasCards)refreshStats("publicStats");
 }
