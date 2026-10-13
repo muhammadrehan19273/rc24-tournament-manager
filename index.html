@@ -129,6 +129,7 @@ body{font-family:'Poppins',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font
 button,input,select,textarea{font-family:inherit}
 button,input:not([type=checkbox]),select{font-size:16px}
 button.small,.linkbtn{font-size:14px}
+#authScreen .btn-row button,#registerBox>button{font-size:13px;padding:4px 12px;min-height:30px}
 table{font-size:14px}
 input:not([type=checkbox]),select{transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
 input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;box-shadow:0 0 0 3px rgba(34,197,94,.28),0 0 18px rgba(56,189,248,.35)}
@@ -151,7 +152,10 @@ textarea:focus{outline:none;border-color:#22c55e;box-shadow:0 0 0 3px rgba(34,19
 .cap b{display:block;font-size:16px;margin:2px 0}
 .cap span{color:var(--cc,#f59e0b);font-weight:700}
 .stat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-table.wide{min-width:760px}
+table.wide{min-width:0;font-size:12px}
+table.wide th,table.wide td{padding:8px 2px}
+table.wide th:first-child,table.wide td:first-child{text-align:left;padding-left:4px;word-break:break-word;min-width:72px}
+table.wide .player-link{font-size:13px;text-align:left}
 .stats-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin:8px 0}
 .player-link{background:none!important;color:#7dd3fc!important;padding:2px 0!important;min-height:0!important;text-align:left;text-decoration:underline;font-weight:600}
 .profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0}
@@ -1252,8 +1256,8 @@ function calcStats(t){
 }
 
 const STAT_COLS={
-  bat:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["inns","Inn","inns"],["runs","Runs","runs"],["hs","HS","hsr"],["avg","Avg","avg"],["sr","SR","sr"],["fifties","50","fifties"],["hundreds","100","hundreds"]],
-  bowl:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["inns","Inn","inns"],["overs","O","balls"],["runs","Runs","runs"],["wkts","Wkts","wkts"],["bavg","Avg","bavg"],["econ","Econ","econ"],["bsr","SR","bsr"],["best","Best","bw"],["w3","3W","w3"],["w4","4W","w4"],["w5","5W","w5"],["w10","10W","w10"]]
+  bat:[["name","Player","name"],["mat","M","mat"],["runs","Runs","runs"],["hs","HS","hsr"],["avg","Avg","avg"],["sr","SR","sr"],["fifties","50","fifties"],["hundreds","100","hundreds"]],
+  bowl:[["name","Player","name"],["mat","M","mat"],["overs","O","balls"],["runs","Runs","runs"],["wkts","Wkts","wkts"],["bavg","Avg","bavg"],["econ","Econ","econ"],["best","Best","bw"]]
 };
 const LOWER_BETTER=["bavg","econ","bsr"];
 
@@ -1312,7 +1316,7 @@ function statsHTML(cid,t){
   if(st.tab==="mvp")return html+mvpHTML(cid,s,allowed);
   let rows=[],cols=STAT_COLS[st.tab];
   if(st.tab==="allround"){
-    cols=[["name","Player","name"],["team","Team","team"],["runs","Runs","runs"],["wkts","Wkts","wkts"],["avg","Bat Avg","avg"],["econ","Bowl Econ","econ"]];
+    cols=[["name","Player","name"],["runs","Runs","runs"],["wkts","Wkts","wkts"],["avg","Bat Avg","avg"],["econ","Bowl Econ","econ"]];
     rows=s.allround.filter(allowed);
   }else rows=(s[st.tab]||[]).filter(allowed);
   const sortKey=st.sort[st.tab]|| (st.tab==="allround"?"runs":cols[0][2]);
