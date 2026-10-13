@@ -157,6 +157,15 @@ table.wide{min-width:760px}
 .profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:10px 0}
 .profile-stat{background:#16263c;border:1px solid #2a3f5c;border-radius:10px;padding:10px}
 .profile-stat small{display:block;color:#b4c0d0}.profile-stat strong{font-size:20px;color:#f472b6}
+.mvp-rules{margin:8px 0 12px;background:#16263c;border:1px solid #2a3f5c;border-radius:12px;padding:10px 12px}
+.mvp-rules summary{cursor:pointer;font-weight:700;color:#7dd3fc}
+.mvp-rules ul{margin:8px 0 0 18px;padding:0;color:#b4c0d0;font-size:14px;line-height:1.5}
+.mvp-row{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid #2a3f5c}
+.mvp-rank{flex:0 0 32px;height:32px;border-radius:50%;background:#2dd4bf;color:#06222b;font-weight:800;display:flex;align-items:center;justify-content:center}
+.mvp-row:nth-child(1) .mvp-rank{background:#fbbf24}
+.mvp-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.mvp-info small{color:#b4c0d0;font-size:13px}
+.mvp-total{font-size:20px;color:#fff}
 .stats-note{font-size:13px;color:#b4c0d0;margin:8px 0}
 
 table.mini{min-width:0;font-size:14px;margin-top:6px}
@@ -1239,7 +1248,7 @@ function calcStats(t){
 }
 
 const STAT_COLS={
-  bat:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["inns","Inn","inns"],["runs","Runs","runs"],["hs","HS","hsr"],["avg","Avg","avg"],["sr","SR","sr"],["fifties","50","fifties"],["hundreds","100","hundreds"],["no","NO","no"]],
+  bat:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["inns","Inn","inns"],["runs","Runs","runs"],["hs","HS","hsr"],["avg","Avg","avg"],["sr","SR","sr"],["fifties","50","fifties"],["hundreds","100","hundreds"]],
   bowl:[["name","Player","name"],["team","Team","team"],["mat","M","mat"],["inns","Inn","inns"],["overs","O","balls"],["runs","Runs","runs"],["wkts","Wkts","wkts"],["bavg","Avg","bavg"],["econ","Econ","econ"],["bsr","SR","bsr"],["best","Best","bw"],["w3","3W","w3"],["w4","4W","w4"],["w5","5W","w5"],["w10","10W","w10"]]
 };
 const LOWER_BETTER=["bavg","econ","bsr"];
@@ -1262,6 +1271,28 @@ function capCard(label,color,row,value){
   return '<div class="cap" style="--cc:'+color+'"><small>'+label+"</small><b>"+esc(row.name)+"</b><span>"+value+"</span></div>";
 }
 
+/* MVP = Most Valuable Player (batting points + bowling points) */
+function mvpRows(s){
+  const map={};
+  const row=x=>map[x.id] || (map[x.id]={id:x.id,name:x.name,team:x.team,bat:0,bowl:0});
+  s.bat.forEach(b=>{row(b).bat=b.runs*0.2+b.fifties*3+b.hundreds*6-b.ducks;});
+  s.bowl.forEach(w=>{row(w).bowl=w.wkts*3+w.w3*2+w.w4*4+w.w5*6+w.w10*10;});
+  return Object.values(map).map(r=>({...r,total:r.bat+r.bowl})).sort((a,b)=>b.total-a.total || b.bat-a.bat);
+}
+
+function mvpHTML(cid,s,allowed){
+  const rows=mvpRows(s).filter(allowed);
+  const rules='<details class="mvp-rules"><summary>MVP Rules ⓘ</summary><ul>'+
+    '<li><b>Batting:</b> 0.2 point per run, +3 for a 50, +6 for a 100, −1 for a duck (out for 0).</li>'+
+    '<li><b>Bowling:</b> 3 points per wicket, +2 for 3 wickets, +4 for 4 wickets, +6 for 5 wickets, +10 for 10 wickets.</li>'+
+    '<li><b>Total</b> = Batting + Bowling. The player with the highest total is the Most Valuable Player.</li></ul></details>';
+  if(!rows.length)return rules+'<p class="muted">No MVP data yet.</p>';
+  return rules+'<div class="mvp-list">'+rows.map((r,i)=>
+    '<div class="mvp-row"><span class="mvp-rank">'+(i+1)+'</span><div class="mvp-info"><button class="player-link" onclick="openPlayerProfile(\''+cid+'\',\''+r.id+'\')">'+esc(r.name)+'</button>'+
+    '<small>Bat '+r.bat.toFixed(1)+' &nbsp; Bowl '+r.bowl.toFixed(1)+'</small></div><b class="mvp-total">'+r.total.toFixed(1)+'</b></div>'
+  ).join("")+'</div>';
+}
+
 function statsHTML(cid,t){
   const st=statsState[cid] || (statsState[cid]={tab:"bat",sort:{bat:"runs",bowl:"wkts",allround:"runs"}});
   const s=calcStats(t);
@@ -1272,8 +1303,9 @@ function statsHTML(cid,t){
   const orange=maxBy(s.bat,"runs",x=>x.runs>0),purple=[...s.bowl].filter(x=>allowed(x)&&x.wkts>0).sort((a,b)=>b.wkts-a.wkts||a.runs-b.runs)[0];
   const bestSr=maxBy(s.bat,"sr",x=>x.balls>0),bestEco=maxBy(s.bowl,"econ",x=>x.balls>0),hs=maxBy(s.bat,"hsr",x=>x.hsr>0);
   let html='<div class="caps">'+capCard("🟠 Most Runs","#f59e0b",orange,orange&&orange.runs+" runs")+capCard("🟣 Most Wickets","#a78bfa",purple,purple&&purple.wkts+" wickets")+capCard("⚡ Best Strike Rate","#22c55e",bestSr,bestSr&&bestSr.sr.toFixed(1))+capCard("🎯 Best Economy","#38bdf8",bestEco,bestEco&&bestEco.econ.toFixed(2))+capCard("🏏 Highest Score","#2dd4bf",hs,hs&&hs.hs)+"</div>";
-  const tabs=[["bat","Batting"],["bowl","Bowling"],["allround","All-rounders"]];
+  const tabs=[["bat","Batting"],["bowl","Bowling"],["allround","All-rounders"],["mvp","MVP"]];
   html+='<div class="stat-tabs">'+tabs.map(x=>'<button class="small '+(st.tab===x[0]?"":"gray")+'" onclick="statsTab(\''+cid+'\',\''+x[0]+'\')">'+x[1]+'</button>').join("")+"</div>";
+  if(st.tab==="mvp")return html+mvpHTML(cid,s,allowed);
   let rows=[],cols=STAT_COLS[st.tab];
   if(st.tab==="allround"){
     cols=[["name","Player","name"],["team","Team","team"],["runs","Runs","runs"],["wkts","Wkts","wkts"],["avg","Bat Avg","avg"],["econ","Bowl Econ","econ"]];
