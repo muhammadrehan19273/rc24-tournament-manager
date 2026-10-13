@@ -1215,16 +1215,20 @@ function calcStats(t){
       const wkts=Number(x.oWk) || 0;            // wickets this player took
 
       // batting
-      const b=bat[x.id] || (bat[x.id]={id:x.id,...info(x.id),mat:0,inns:0,no:0,runs:0,balls:0,fifties:0,hundreds:0,ducks:0,hsr:-1,hsno:false});
+      const b=bat[x.id] || (bat[x.id]={id:x.id,...info(x.id),mat:0,inns:0,no:0,runs:0,balls:0,fifties:0,hundreds:0,ducks:0,hsr:-1,hsno:false,mvp:0});
       b.mat++;b.inns++;if(!out)b.no++;
       b.runs+=runs;b.balls+=balls;
       if(runs>=100)b.hundreds++;else if(runs>=50)b.fifties++;
+      if(runs>=10){b.mvp+=runs/10;if(balls>0 && runs*100/balls>=130)b.mvp+=1;}
+      if(runs>=50)b.mvp+=1;
+      if(runs>=100)b.mvp+=1;
       if(out && runs===0)b.ducks++;
       if(runs>b.hsr || (runs===b.hsr && !out && !b.hsno)){b.hsr=runs;b.hsno=!out;}
 
       // bowling
-      const w=bowl[x.id] || (bowl[x.id]={id:x.id,...info(x.id),mat:0,inns:0,balls:0,runs:0,wkts:0,bw:-1,br:0,w3:0,w4:0,w5:0,w10:0});
+      const w=bowl[x.id] || (bowl[x.id]={id:x.id,...info(x.id),mat:0,inns:0,balls:0,runs:0,wkts:0,bw:-1,br:0,w3:0,w4:0,w5:0,w10:0,mvp:0});
       w.mat++;w.inns++;w.balls+=bBalls;w.runs+=conceded;w.wkts+=wkts;
+      w.mvp+=wkts*2+(wkts>=3?1:0)+(wkts>=5?1:0);
       if(wkts>=10)w.w10++;
       if(wkts>=5)w.w5++;else if(wkts>=4)w.w4++;else if(wkts>=3)w.w3++;
       if(wkts>w.bw || (wkts===w.bw && conceded<w.br)){w.bw=wkts;w.br=conceded;}
@@ -1275,16 +1279,16 @@ function capCard(label,color,row,value){
 function mvpRows(s){
   const map={};
   const row=x=>map[x.id] || (map[x.id]={id:x.id,name:x.name,team:x.team,bat:0,bowl:0});
-  s.bat.forEach(b=>{row(b).bat=b.runs*0.2+b.fifties*3+b.hundreds*6-b.ducks;});
-  s.bowl.forEach(w=>{row(w).bowl=w.wkts*3+w.w3*2+w.w4*4+w.w5*6+w.w10*10;});
+  s.bat.forEach(b=>{row(b).bat=b.mvp;});
+  s.bowl.forEach(w=>{row(w).bowl=w.mvp;});
   return Object.values(map).map(r=>({...r,total:r.bat+r.bowl})).sort((a,b)=>b.total-a.total || b.bat-a.bat);
 }
 
 function mvpHTML(cid,s,allowed){
   const rows=mvpRows(s).filter(allowed);
   const rules='<details class="mvp-rules"><summary>MVP Rules ⓘ</summary><ul>'+
-    '<li><b>Batting:</b> 0.2 point per run, +3 for a 50, +6 for a 100, −1 for a duck (out for 0).</li>'+
-    '<li><b>Bowling:</b> 3 points per wicket, +2 for 3 wickets, +4 for 4 wickets, +6 for 5 wickets, +10 for 10 wickets.</li>'+
+    '<li><b>Batting (each match):</b> runs ÷ 10 (only if 10+ runs), +1 for 50+ runs, +1 more for 100+ runs, +1 for strike rate 130+ (with 10+ runs).</li>'+
+    '<li><b>Bowling (each match):</b> 2 points per wicket, +1 for 3+ wickets, +1 more for 5+ wickets.</li>'+
     '<li><b>Total</b> = Batting + Bowling. The player with the highest total is the Most Valuable Player.</li></ul></details>';
   if(!rows.length)return rules+'<p class="muted">No MVP data yet.</p>';
   return rules+'<div class="mvp-list">'+rows.map((r,i)=>
