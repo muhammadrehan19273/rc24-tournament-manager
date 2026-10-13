@@ -130,6 +130,101 @@ button,input,select,textarea{font-family:inherit}
 button,input:not([type=checkbox]),select{font-size:16px}
 button.small,.linkbtn{font-size:14px}
 #authScreen .btn-row button,#registerBox>button{font-size:13px;padding:4px 12px;min-height:30px}
+#truck-loader{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(circle at 50% 40%,#10294a,#061321 60%,#01040a);color:#e9fbff;transition:opacity .6s ease,visibility .6s ease;cursor:pointer}
+#truck-loader.tl-hide{opacity:0;visibility:hidden;pointer-events:none}
+.tl-title{font-weight:800;letter-spacing:.14em;font-size:clamp(20px,6vw,28px);text-shadow:0 0 14px #0ea5e9aa}
+.tl-sub{margin-top:-14px;font-size:11px;letter-spacing:.3em;color:#7dd3fc}
+.tl-scene{position:relative;width:min(320px,80vw);height:92px;--p:0}
+.tl-truck{position:absolute;left:calc((100% - 112px) * var(--p));bottom:9px;width:112px;animation:tlBounce .22s ease-in-out infinite alternate}
+.tl-truck svg{display:block;width:100%;height:auto;overflow:visible}
+.tl-wheel{transform-box:fill-box;transform-origin:center;animation:tlSpin .45s linear infinite}
+.tl-road{position:absolute;left:0;right:0;bottom:0;height:9px;border-radius:6px;background:#1e293b;overflow:hidden}
+.tl-fill{position:absolute;left:0;top:0;bottom:0;width:calc(var(--p) * 100%);border-radius:6px;background:linear-gradient(90deg,#0ea5e9,#38bdf8,#a78bfa)}
+.tl-dash{position:absolute;inset:3px 0 auto 0;height:3px;background:repeating-linear-gradient(90deg,#ffffff55 0 10px,transparent 10px 22px);animation:tlRoad .4s linear infinite;opacity:.55}
+.tl-speed{position:absolute;left:calc((100% - 112px) * var(--p) - 30px);bottom:30px;width:34px;height:20px}
+.tl-speed i{position:absolute;right:0;height:2px;border-radius:2px;background:#7dd3fc;opacity:.6;animation:tlLine .35s linear infinite}
+.tl-speed i:nth-child(1){top:2px;width:22px}.tl-speed i:nth-child(2){top:9px;width:30px;animation-delay:.12s}.tl-speed i:nth-child(3){top:16px;width:18px;animation-delay:.22s}
+.tl-pct{font-size:14px;letter-spacing:.2em;color:#bae6fd;font-variant-numeric:tabular-nums}
+.tl-skip{position:absolute;bottom:22px;font-size:11px;letter-spacing:.15em;color:#64748b}
+@keyframes tlSpin{to{transform:rotate(360deg)}}
+@keyframes tlBounce{from{transform:translateY(0)}to{transform:translateY(-1.5px)}}
+@keyframes tlRoad{from{transform:translateX(0)}to{transform:translateX(-22px)}}
+@keyframes tlLine{from{transform:translateX(8px);opacity:0}30%{opacity:.7}to{transform:translateX(-14px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.tl-wheel,.tl-truck,.tl-dash,.tl-speed i{animation:none}}
+/* ---------- animated login ---------- */
+.auth-stage{max-width:450px;margin:8px auto 0;perspective:700px}
+.auth-stage .auth-box{margin:0 auto}
+.auth-strip{position:relative;height:150px;overflow:hidden;pointer-events:none}
+.auth-char-move{position:absolute;left:50%;bottom:0;margin-left:-58px;width:116px;height:142px}
+.auth-char{width:100%;height:100%;display:block;overflow:visible}
+.auth-char *{transform-box:view-box}
+.auth-char .skin{fill:#f2c6a0}
+.auth-char .hair{fill:#3b2a1a}
+.auth-char .jacket{stroke:#38bdf8;fill:#38bdf8}
+.auth-char .pants{stroke:#64748b}
+.auth-char .shoe{fill:#e2e8f0}
+.auth-char .bagbody{fill:#b45309}
+.auth-char .baghandle{stroke:#78350f;fill:none;stroke-width:3;stroke-linecap:round}
+.auth-char .limb{fill:none;stroke-width:9;stroke-linecap:round}
+.auth-char .shadow{fill:rgba(0,0,0,.4)}
+.legL{transform-origin:62px 108px}.legR{transform-origin:78px 108px}
+.armL{transform-origin:56px 68px}.armR{transform-origin:84px 68px}
+.char-body{transform-origin:70px 110px}
+.char-head{transform-origin:70px 56px}
+
+@keyframes walkIn{from{transform:translateX(-62vw)}to{transform:translateX(0)}}
+@keyframes legA{0%{transform:rotate(0)}25%{transform:rotate(24deg)}50%{transform:rotate(0)}75%{transform:rotate(-24deg)}100%{transform:rotate(0)}}
+@keyframes legB{0%{transform:rotate(0)}25%{transform:rotate(-24deg)}50%{transform:rotate(0)}75%{transform:rotate(24deg)}100%{transform:rotate(0)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes armSwing{0%{transform:rotate(0)}25%{transform:rotate(-22deg)}50%{transform:rotate(0)}75%{transform:rotate(22deg)}100%{transform:rotate(0)}}
+@keyframes bagDrop{0%{transform:translateY(0)}70%{transform:translateY(28px)}85%{transform:translateY(23px)}100%{transform:translateY(28px)}}
+@keyframes throwUp{0%{transform:rotate(0)}30%{transform:rotate(-172deg)}55%{transform:rotate(-150deg)}100%{transform:rotate(0)}}
+@keyframes cardIn{0%{opacity:0;transform:translateY(-120px) rotateX(-80deg) scale(.6)}55%{opacity:1;transform:translateY(8px) rotateX(8deg) scale(1.02)}80%{transform:translateY(-3px) rotateX(-2deg) scale(1)}100%{opacity:1;transform:none}}
+@keyframes idle{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+@keyframes nod{0%,100%{transform:rotate(0)}50%{transform:rotate(5deg)}}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-24deg)}}
+
+.auth-stage.intro .auth-char-move{animation:walkIn 1s cubic-bezier(.25,.6,.35,1) .1s both}
+.auth-stage.intro .legL{animation:legA .5s linear .1s 2}
+.auth-stage.intro .legR{animation:legB .5s linear .1s 2}
+.auth-stage.intro .char-body{animation:bob .25s ease-in-out .1s 4,idle 2.4s ease-in-out 2.1s infinite}
+.auth-stage.intro .armL{animation:armSwing .5s linear .1s 2,wave 1.6s ease-in-out 2.3s infinite}
+.auth-stage.intro .bag{animation:bagDrop .3s ease-in 1.1s both}
+.auth-stage.intro .armR{animation:throwUp .9s ease-in-out 1.1s both}
+.auth-stage.intro .char-head{animation:nod 1.2s ease-in-out 2.1s infinite}
+.auth-stage.intro .auth-box{animation:cardIn .85s cubic-bezier(.2,.9,.3,1) 1.3s both}
+.auth-stage:not(.intro) .bag{transform:translateY(28px)}
+
+/* success dance */
+.auth-success{display:none;text-align:center;max-width:450px;margin:0 auto}
+.auth-success h2{margin:0 0 6px}
+.auth-stage.success .auth-box{display:none}
+.auth-stage.success .auth-success{display:block;animation:popIn .5s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes popIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes danceBody{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(7deg) translateY(-6px)}}
+@keyframes danceArmL{0%,100%{transform:rotate(110deg)}50%{transform:rotate(165deg)}}
+@keyframes danceArmR{0%,100%{transform:rotate(-165deg)}50%{transform:rotate(-110deg)}}
+@keyframes danceLeg{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}
+@keyframes danceLegB{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
+@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.auth-stage.success .char-body{animation:danceBody .45s ease-in-out infinite}
+.auth-stage.success .armL{animation:danceArmL .45s ease-in-out infinite}
+.auth-stage.success .armR{animation:danceArmR .45s ease-in-out infinite}
+.auth-stage.success .legL{animation:danceLeg .45s ease-in-out infinite}
+.auth-stage.success .legR{animation:danceLegB .45s ease-in-out infinite}
+.auth-stage.success .char-head{animation:nod .45s ease-in-out infinite}
+.auth-stage.success .auth-char-move{animation:hop .45s ease-in-out infinite}
+
+.auth-stage.hold *{animation-play-state:paused!important}
+/* wrong password shake */
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.auth-stage .auth-box.shake{animation:shake .4s ease-in-out}
+
+@media (prefers-reduced-motion:reduce){
+  .auth-stage *,.auth-stage.intro *{animation:none!important}
+  .auth-stage .auth-char-move{transform:none}
+}
+
 table{font-size:14px}
 input:not([type=checkbox]),select{transition:border-color .2s ease,box-shadow .2s ease,background .2s ease}
 input:focus,select:focus{outline:none;border-color:#22c55e;background:#0c1c31;box-shadow:0 0 0 3px rgba(34,197,94,.28),0 0 18px rgba(56,189,248,.35)}
@@ -193,17 +288,6 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
 #sweep.go{animation:sweep .8s ease-out}
 @keyframes sweep{0%{transform:translateX(-100%);opacity:1}100%{transform:translateX(100%);opacity:0}}
 @media(prefers-reduced-motion:reduce){.section.enter,.section.enter>*,.section.enter>.grid>.stat{animation:none!important}}
-/* REHAN'S TECHNOLOGY INTRO */
-#rehan-intro{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;background:radial-gradient(circle,#10364b,#061321 55%,#01040a);color:#e9fbff;transition:opacity .8s ease,visibility .8s ease}
-#rehan-intro.rehan-hide{opacity:0;visibility:hidden;pointer-events:none}
-.rehan-energy{position:absolute;width:210px;height:210px;border:2px solid #47e8ff88;border-radius:50%;box-shadow:0 0 35px #00d9ff55,inset 0 0 35px #00d9ff33;animation:rehan-orbit 3s linear infinite}
-.rehan-brand{position:relative;z-index:1;padding:20px;text-align:center;animation:rehan-materialize 1.5s ease both}
-.rehan-brand small{display:block;margin-bottom:16px;color:#67e8f9;font-size:10px;letter-spacing:.3em}
-.rehan-brand h1{margin:0;font-size:clamp(28px,8vw,48px);font-weight:900;overflow-wrap:anywhere;text-shadow:0 0 12px #00d9ff,0 0 35px #008cff}
-.rehan-brand p{margin-top:16px;color:#a4c8dc;font-size:11px;letter-spacing:.12em}
-.rehan-skip{position:absolute;right:18px;bottom:24px;padding:12px 16px;border:1px solid #67e8f9;background:#092238;color:white}
-@keyframes rehan-orbit{from{transform:rotate(0deg) scale(.75)}50%{transform:rotate(180deg) scale(1)}to{transform:rotate(360deg) scale(.75)}}
-@keyframes rehan-materialize{from{opacity:0;transform:translateY(24px) scale(.85);filter:blur(10px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
 </style>
 </head>
 
@@ -213,15 +297,31 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
 <canvas id="hackerBg"></canvas>
 <div id="sweep"></div>
 
-<!-- REHAN'S TECHNOLOGY INTRO -->
-<div id="rehan-intro">
-  <div class="rehan-energy"></div>
-  <div class="rehan-brand">
-    <small>INITIALIZING EXPERIENCE</small>
-    <h1>REHAN'S TECHNOLOGY</h1>
-    <p>CREATIVITY · TECHNOLOGY · INNOVATION</p>
+<!-- TRUCK LOADER -->
+<div id="truck-loader" role="status" aria-label="Loading">
+  <div class="tl-title">🏏 RC24 TOURNAMENTS</div>
+  <div class="tl-sub">LOADING</div>
+  <div class="tl-scene" id="tlScene">
+    <div class="tl-speed"><i></i><i></i><i></i></div>
+    <div class="tl-truck">
+      <svg viewBox="0 0 120 66" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="4" width="76" height="42" rx="5" fill="#38bdf8"/>
+        <rect x="0" y="4" width="76" height="8" rx="4" fill="#0ea5e9"/>
+        <circle cx="38" cy="26" r="11" fill="#dc2626"/>
+        <path d="M30 20 Q38 26 30 32 M46 20 Q38 26 46 32" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <path d="M78 16 H100 Q108 16 112 26 L116 36 V46 H78 Z" fill="#6366f1"/>
+        <path d="M84 21 H98 Q103 21 106 28 H84 Z" fill="#bae6fd"/>
+        <rect x="0" y="46" width="118" height="6" rx="3" fill="#334155"/>
+        <rect x="110" y="40" width="8" height="6" rx="2" fill="#fde68a"/>
+        <g class="tl-wheel"><circle cx="20" cy="56" r="9" fill="#0f172a"/><circle cx="20" cy="56" r="4" fill="#94a3b8"/><path d="M20 49 V63 M13 56 H27" stroke="#0f172a" stroke-width="2"/></g>
+        <g class="tl-wheel"><circle cx="54" cy="56" r="9" fill="#0f172a"/><circle cx="54" cy="56" r="4" fill="#94a3b8"/><path d="M54 49 V63 M47 56 H61" stroke="#0f172a" stroke-width="2"/></g>
+        <g class="tl-wheel"><circle cx="96" cy="56" r="9" fill="#0f172a"/><circle cx="96" cy="56" r="4" fill="#94a3b8"/><path d="M96 49 V63 M89 56 H103" stroke="#0f172a" stroke-width="2"/></g>
+      </svg>
+    </div>
+    <div class="tl-road"><div class="tl-fill"></div><div class="tl-dash"></div></div>
   </div>
-  <button id="rehan-skip" class="rehan-skip" type="button">Skip Intro →</button>
+  <div class="tl-pct" id="tlPct">0%</div>
+  <div class="tl-skip">TAP TO SKIP</div>
 </div>
 
 <header>
@@ -231,6 +331,31 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
 
 <!-- AUTH -->
 <div id="authScreen" class="container">
+<div id="authStage" class="auth-stage intro hold">
+  <div class="auth-strip" aria-hidden="true">
+    <div class="auth-char-move">
+      <svg class="auth-char" viewBox="0 0 140 170" xmlns="http://www.w3.org/2000/svg">
+        <ellipse class="shadow" cx="70" cy="161" rx="32" ry="5"/>
+        <g class="legL"><path class="limb pants" d="M62 108 L60 153"/><ellipse class="shoe" cx="58" cy="157" rx="8" ry="4"/></g>
+        <g class="legR"><path class="limb pants" d="M78 108 L80 153"/><ellipse class="shoe" cx="82" cy="157" rx="8" ry="4"/></g>
+        <g class="char-body">
+          <rect class="jacket" x="52" y="60" width="36" height="52" rx="14"/>
+          <path d="M64 60 L70 72 L76 60 Z" fill="#f8fafc"/>
+          <g class="armL"><path class="limb jacket" d="M56 68 L44 102"/><circle class="skin" cx="44" cy="105" r="5"/></g>
+          <g class="armR"><path class="limb jacket" d="M84 68 L96 102"/><circle class="skin" cx="96" cy="105" r="5"/></g>
+          <g class="char-head">
+            <rect class="skin" x="65" y="52" width="10" height="8" rx="3"/>
+            <circle class="skin" cx="70" cy="40" r="16"/>
+            <path class="hair" d="M54 40 A16 16 0 0 1 86 40 Q80 32 70 33 Q60 32 54 40 Z"/>
+            <path class="hair" d="M54 38 Q50 52 56 58 Q58 48 58 40 Z"/>
+            <circle cx="63.500" cy="42" r="1.800" fill="#1e293b"/><circle cx="76.500" cy="42" r="1.800" fill="#1e293b"/>
+            <path d="M65 48 Q70 52 75 48" stroke="#9a3412" stroke-width="1.800" fill="none" stroke-linecap="round"/>
+          </g>
+        </g>
+        <g class="bag"><path class="baghandle" d="M92 114 Q96 105 100 114"/><rect class="bagbody" x="84" y="113" width="26" height="19" rx="3"/><rect x="84" y="121" width="26" height="2" fill="#78350f"/></g>
+      </svg>
+    </div>
+  </div>
   <div class="card auth-box">
 
     <div id="loginBox">
@@ -267,6 +392,11 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
     </div>
 
   </div>
+  <div class="card auth-success">
+    <h2>🎉 Success!</h2>
+    <p class="muted">Welcome back. Opening your tournaments…</p>
+  </div>
+</div>
 </div>
 
 <!-- APP -->
@@ -543,6 +673,18 @@ function firebaseError(error){
   return error.message || "Something went wrong.";
 }
 
+/* AUTH ANIMATION */
+let celebrateLogin=false,hadUser=false;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function playAuthIntro(){
+  const st=document.getElementById("authStage");if(!st)return;
+  st.classList.remove("intro","success","hold");void st.offsetWidth;st.classList.add("intro");
+}
+function shakeAuth(){
+  const box=document.querySelector("#authStage .auth-box");if(!box)return;
+  box.classList.remove("shake");void box.offsetWidth;box.classList.add("shake");
+}
+
 /* AUTH UI */
 window.showRegister=function(){
   document.getElementById("loginBox").classList.add("hidden");
@@ -564,10 +706,13 @@ window.register=async function(){
     return;
   }
   try{
+    celebrateLogin=true;
     await createUserWithEmailAndPassword(auth,email,password);
     msg("registerMsg","Account created successfully!","success");
   }catch(error){
+    celebrateLogin=false;
     msg("registerMsg",firebaseError(error),"error");
+    shakeAuth();
   }
 };
 
@@ -580,9 +725,12 @@ window.login=async function(){
     return;
   }
   try{
+    celebrateLogin=true;
     await signInWithEmailAndPassword(auth,email,password);
   }catch(error){
+    celebrateLogin=false;
     msg("loginMsg",firebaseError(error),"error");
+    shakeAuth();
   }
 };
 
@@ -611,7 +759,14 @@ onAuthStateChanged(auth, async user=>{
   currentUser=user;
   if(isPublicView)return; // do not show login/app screens on the public page
   if(user){
+    if(celebrateLogin){
+      celebrateLogin=false;
+      document.getElementById("authStage")?.classList.add("success");
+      await sleep(1700);
+    }
+    hadUser=true;
     document.getElementById("authScreen").classList.add("hidden");
+    document.getElementById("authStage")?.classList.remove("success");
     document.getElementById("appScreen").classList.remove("hidden");
     document.getElementById("publicScreen").classList.add("hidden");
     document.getElementById("userEmail").textContent=user.email || "";
@@ -620,6 +775,7 @@ onAuthStateChanged(auth, async user=>{
   }else{
     document.getElementById("authScreen").classList.remove("hidden");
     document.getElementById("appScreen").classList.add("hidden");
+    if(hadUser){hadUser=false;playAuthIntro();}
   }
 });
 
@@ -1980,24 +2136,40 @@ if(isPublicView){
 <!-- INTRO SCRIPT -->
 <script>
 (function () {
-  const intro = document.getElementById("rehan-intro");
-  const skip = document.getElementById("rehan-skip");
-  if (!intro || !skip) return;
-
+  const loader = document.getElementById("truck-loader");
+  if (!loader) { const s0 = document.getElementById("authStage"); if (s0) s0.classList.remove("hold"); return; }
+  const scene = document.getElementById("tlScene");
+  const pct = document.getElementById("tlPct");
+  const DURATION = 2400;
+  const t0 = performance.now();
   let closed = false;
-  function closeIntro() {
+
+  function closeLoader() {
     if (closed) return;
     closed = true;
-    intro.classList.add("rehan-hide");
-    // focus the email field once the intro closes (desktop only, so the phone keyboard does not pop up by itself)
+    loader.classList.add("tl-hide");
+    const stg = document.getElementById("authStage"); if (stg) stg.classList.remove("hold");
     const em = document.getElementById("loginEmail");
     if (em && !em.closest(".hidden") && window.matchMedia("(pointer: fine)").matches) em.focus();
-    window.setTimeout(function () { intro.remove(); }, 850);
+    window.setTimeout(function () { loader.remove(); }, 700);
   }
-  skip.addEventListener("click", closeIntro);
+
+  function tick(now) {
+    if (closed) return;
+    const t = Math.min(1, (now - t0) / DURATION);
+    const p = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // ease in-out
+    scene.style.setProperty("--p", p.toFixed(4));
+    pct.textContent = Math.round(p * 100) + "%";
+    if (t < 1) requestAnimationFrame(tick);
+    else window.setTimeout(closeLoader, 250);
+  }
+  requestAnimationFrame(tick);
+  loader.addEventListener("click", closeLoader);
   document.addEventListener("touchstart", function () {}, { passive: true }); // enables :active on iOS
-  window.setTimeout(closeIntro, 3500);
+  window.setTimeout(closeLoader, 6000); // safety
 })();
+// safety: never leave the login animation paused
+window.setTimeout(function () { var s = document.getElementById("authStage"); if (s) s.classList.remove("hold"); }, 7000);
 </script>
 
 <!-- 3D HACKER BACKGROUND SCRIPT -->
