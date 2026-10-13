@@ -183,6 +183,39 @@ nav#sideNav.open{transform:none;visibility:visible;transition:transform .32s cub
 .sn-who small{display:block;font-size:12px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #sideNav .sn-logout{margin-top:4px;color:#fca5a5;border-color:#4b2230}
 @media (prefers-reduced-motion:reduce){nav#sideNav,#navOverlay{transition:none}}
+/* ---------- public sidebar menu (same look) ---------- */
+#pTopbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(8,18,32,.92);backdrop-filter:blur(12px);border-bottom:1px solid #1b3550}
+#pTopbar #pMenuBtn{flex:0 0 auto;width:44px;min-height:40px;height:40px;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-radius:12px;background:#10223a;border:1px solid #23415f;box-shadow:none}
+#pTopbar #pMenuBtn::before{display:none}
+#pMenuBtn span{display:block;width:20px;height:2.5px;border-radius:2px;background:#e2e8f0;transition:transform .25s,opacity .25s}
+#pMenuBtn.open span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+#pMenuBtn.open span:nth-child(2){opacity:0}
+#pMenuBtn.open span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+#pTopTitle{flex:1;font-size:18px;font-weight:800;color:#f1f5f9;letter-spacing:.02em}
+.tb-brand{font-size:13px;font-weight:700;color:#7dd3fc;letter-spacing:.12em}
+#pNavOverlay{position:fixed;inset:0;z-index:150;background:rgba(2,6,14,.62);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s}
+#pNavOverlay.open{opacity:1;pointer-events:auto}
+nav#pSideNav{position:fixed;top:0;left:0;bottom:0;z-index:200;width:min(80vw,300px);display:flex;flex-direction:column;flex-wrap:nowrap;gap:6px;overflow-x:hidden;overflow-y:auto;padding:18px 14px;background:linear-gradient(180deg,#0b1a2e,#060f1c);border:0;border-right:1px solid #1f3d5c;border-radius:0 24px 24px 0;box-shadow:14px 0 44px rgba(0,0,0,.6);backdrop-filter:none;transform:translateX(-108%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s .32s}
+nav#pSideNav.open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s}
+.sn-logo{display:flex;align-items:center;gap:12px;padding:4px 6px 16px}
+.sn-logo-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,#22d3ee,#38bdf8);box-shadow:0 0 18px rgba(34,211,238,.45)}
+.sn-logo b{font-size:19px;color:#fff;line-height:1.1}
+.sn-logo em{display:block;font-style:normal;font-size:11px;font-weight:600;letter-spacing:.14em;color:#7dd3fc;margin-top:2px}
+#pSideNav button{display:flex;align-items:center;justify-content:flex-start;gap:14px;width:100%;flex:0 0 auto;text-align:left;padding:12px 14px;min-height:48px;border-radius:14px;background:transparent;border:1px solid transparent;color:#cbd5e1;font-size:15px;font-weight:600;box-shadow:none;transform:none;transition:background .2s,color .2s,box-shadow .2s}
+#pSideNav button::before{display:none}
+#pSideNav button:active{transform:scale(.97);box-shadow:none}
+#pSideNav button .ni{width:24px;text-align:center;font-size:18px;filter:grayscale(.2)}
+#pSideNav button.active{background:var(--ac,#22d3ee);color:#04121f;box-shadow:0 6px 22px color-mix(in srgb,var(--ac,#22d3ee) 45%,transparent);transform:none}
+.sn-spacer{flex:1;min-height:14px}
+.sn-user{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid #1f6f8b;border-radius:14px;background:rgba(14,40,64,.55)}
+.sn-avatar{flex:0 0 38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#1e1b4b;background:#a78bfa}
+.sn-who{min-width:0}
+.sn-who b{display:block;font-size:14px;color:#fff}
+.sn-who small{display:block;font-size:12px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#pSideNav .sn-logout{margin-top:4px;color:#fca5a5;border-color:#4b2230}
+@media (prefers-reduced-motion:reduce){nav#pSideNav,#pNavOverlay{transition:none}}
+.psec-off{display:none!important}
+#pSideNav button.pm-off{display:none}
 /* ---------- animated login ---------- */
 .auth-stage{max-width:450px;margin:8px auto 0;perspective:700px}
 .auth-stage .auth-box{margin:0 auto}
@@ -613,6 +646,23 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
 
 <!-- PUBLIC PAGE -->
 <div id="publicScreen" class="hidden">
+  <div id="pTopbar">
+    <button id="pMenuBtn" type="button" onclick="togglePublicMenu()" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <div id="pTopTitle">Points Table</div>
+    <div class="tb-brand">🏏 RC24</div>
+  </div>
+  <div id="pNavOverlay" onclick="closePublicMenu()"></div>
+  <nav id="pSideNav" aria-label="Tournament menu">
+    <div class="sn-logo"><span class="sn-logo-icon">🏏</span><b>RC24 <em>Tournament</em></b></div>
+    <button id="pmTeams" style="--ac:#38bdf8" onclick="showPublicSection('teams')"><span class="ni">👥</span><span class="nl">Teams</span></button>
+    <button id="pmFixtures" style="--ac:#a78bfa" onclick="showPublicSection('fixtures')"><span class="ni">📅</span><span class="nl">Fixtures</span></button>
+    <button id="pmKnockout" style="--ac:#f59e0b" onclick="showPublicSection('knockout')"><span class="ni">🏆</span><span class="nl">Knockout</span></button>
+    <button id="pmMatches" style="--ac:#fb7185" onclick="showPublicSection('matches')"><span class="ni">🏏</span><span class="nl">Matches</span></button>
+    <button id="pmPoints" style="--ac:#2dd4bf" onclick="showPublicSection('points')"><span class="ni">📊</span><span class="nl">Points Table</span></button>
+    <button id="pmStats" style="--ac:#22d3ee" onclick="showPublicSection('stats')"><span class="ni">📈</span><span class="nl">Player Stats</span></button>
+    <div class="sn-spacer"></div>
+    <button class="sn-logout" style="color:#7dd3fc;border-color:#1f4d6b" onclick="createOwnTournament()"><span class="ni">🚀</span><span class="nl">Create Your Own</span></button>
+  </nav>
   <div class="container">
 
     <div class="public-header">
@@ -621,32 +671,32 @@ details.sc summary{cursor:pointer;color:var(--ac);font-weight:600}
       <p id="publicInfo" class="muted"></p>
     </div>
 
-    <div class="card">
+    <div class="card" data-psec="teams">
       <h2>👥 Teams</h2>
       <div id="publicTeams"></div>
     </div>
 
-    <div class="card">
+    <div class="card" data-psec="fixtures">
       <h2>📅 Fixtures</h2>
       <div id="publicFixtures"></div>
     </div>
 
-    <div class="card">
+    <div class="card" data-psec="knockout">
       <h2>🏆 Knockout</h2>
       <div id="publicKnockout"></div>
     </div>
 
-    <div class="card">
+    <div class="card" data-psec="matches">
       <h2>🏏 Matches</h2>
       <div id="publicMatches"></div>
     </div>
 
-    <div class="card">
+    <div class="card" data-psec="points">
       <h2>📊 Points Table</h2>
       <div id="publicPoints"></div>
     </div>
 
-    <div class="card hidden" id="publicStatsCard">
+    <div class="card hidden" id="publicStatsCard" data-psec="stats">
       <h2>📈 Player Stats</h2>
       <div id="publicStats"></div><div id="publicStatsProfile" class="hidden"></div>
     </div>
@@ -2169,6 +2219,39 @@ function showPublicError(text){
   document.getElementById("publicInfo").textContent=text;
 }
 
+/* PUBLIC MENU */
+let publicSection="points";
+window.togglePublicMenu=function(){
+  const nav=document.getElementById("pSideNav");
+  const open=!nav.classList.contains("open");
+  nav.classList.toggle("open",open);
+  document.getElementById("pNavOverlay").classList.toggle("open",open);
+  const b=document.getElementById("pMenuBtn");b.classList.toggle("open",open);b.setAttribute("aria-expanded",open?"true":"false");
+  document.body.style.overflow=open?"hidden":"";
+};
+window.closePublicMenu=function(){
+  const nav=document.getElementById("pSideNav");
+  if(nav && nav.classList.contains("open"))togglePublicMenu();
+};
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closePublicMenu();});
+
+window.showPublicSection=function(name){
+  const cardOk=n=>{const c=document.querySelector('[data-psec="'+n+'"]');return !!c && !c.classList.contains("hidden");};
+  if(!cardOk(name))name="teams";
+  publicSection=name;
+  document.querySelectorAll("[data-psec]").forEach(c=>c.classList.toggle("psec-off",c.getAttribute("data-psec")!==name));
+  const map={teams:"pmTeams",fixtures:"pmFixtures",knockout:"pmKnockout",matches:"pmMatches",points:"pmPoints",stats:"pmStats"};
+  Object.keys(map).forEach(k=>{
+    const b=document.getElementById(map[k]);if(!b)return;
+    b.classList.toggle("active",k===name);
+    b.classList.toggle("pm-off",!cardOk(k));
+  });
+  const lbl=document.querySelector("#"+map[name]+" .nl");
+  const tt=document.getElementById("pTopTitle");if(lbl&&tt)tt.textContent=lbl.textContent;
+  closePublicMenu();
+  window.scrollTo({top:0,behavior:"smooth"});
+};
+
 /* RENDER PUBLIC */
 function renderPublic(t){
   document.getElementById("publicTitle").textContent=t.name;
@@ -2206,164 +2289,4 @@ function renderPublic(t){
   document.getElementById("publicPoints").innerHTML=pointsTablesHTML(t);
 
   const hasCards=(t.matches || []).some(m=>!isUnplayed(m.type));
-  document.getElementById("publicStatsCard").classList.toggle("hidden",!hasCards);
-  if(hasCards)refreshStats("publicStats");
-}
-
-/* CREATE YOUR OWN */
-window.createOwnTournament=function(){
-  location.href=location.origin+location.pathname;
-};
-
-/* START */
-if(isPublicView){
-  loadPublicTournament();
-}
-
-</script>
-
-<!-- INTRO SCRIPT -->
-<script>
-(function () {
-  const loader = document.getElementById("truck-loader");
-  if (!loader) { const s0 = document.getElementById("authStage"); if (s0) s0.classList.remove("hold"); return; }
-  const scene = document.getElementById("tlScene");
-  const pct = document.getElementById("tlPct");
-  const DURATION = 2400;
-  const t0 = performance.now();
-  let closed = false;
-
-  function closeLoader() {
-    if (closed) return;
-    closed = true;
-    loader.classList.add("tl-hide");
-    const stg = document.getElementById("authStage"); if (stg) stg.classList.remove("hold");
-    const em = document.getElementById("loginEmail");
-    if (em && !em.closest(".hidden") && window.matchMedia("(pointer: fine)").matches) em.focus();
-    window.setTimeout(function () { loader.remove(); }, 700);
-  }
-
-  function tick(now) {
-    if (closed) return;
-    const t = Math.min(1, (now - t0) / DURATION);
-    const p = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; // ease in-out
-    scene.style.setProperty("--p", p.toFixed(4));
-    pct.textContent = Math.round(p * 100) + "%";
-    if (t < 1) requestAnimationFrame(tick);
-    else window.setTimeout(closeLoader, 250);
-  }
-  requestAnimationFrame(tick);
-  loader.addEventListener("click", closeLoader);
-  document.addEventListener("touchstart", function () {}, { passive: true }); // enables :active on iOS
-  window.setTimeout(closeLoader, 6000); // safety
-})();
-// safety: never leave the login animation paused
-window.setTimeout(function () { var s = document.getElementById("authStage"); if (s) s.classList.remove("hold"); }, 7000);
-</script>
-
-<!-- 3D HACKER BACKGROUND SCRIPT -->
-<script>
-(function () {
-  const cv = document.getElementById("hackerBg");
-  const ctx = cv.getContext("2d");
-  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const CHARS = "01アイウエオカキクケコサシスセソタチツテトナニヌネノ$#<>/{}=+*";
-  let W, H, drops = [], cols = 0, pts = [], mx = 0, my = 0, angY = 0, angX = 0.4;
-
-  // Matrix rain columns, each with its own depth (z) for a 3D feel.
-  function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = innerWidth; H = innerHeight;
-    cv.width = W * dpr; cv.height = H * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cols = Math.floor(W / 16);
-    drops = Array.from({ length: cols }, function () {
-      return { y: Math.random() * -H, z: 0.35 + Math.random() * 0.65 };
-    });
-  }
-
-  // Points spread evenly on a sphere (Fibonacci sphere).
-  for (let i = 0, n = 110; i < n; i++) {
-    const k = i + 0.5;
-    const phi = Math.acos(1 - 2 * k / n);
-    const th = Math.PI * (1 + Math.sqrt(5)) * k;
-    pts.push([Math.cos(th) * Math.sin(phi), Math.cos(phi), Math.sin(th) * Math.sin(phi)]);
-  }
-
-  addEventListener("resize", resize);
-  addEventListener("pointermove", function (e) {
-    mx = (e.clientX / W - 0.5) * 2;
-    my = (e.clientY / H - 0.5) * 2;
-  });
-  resize();
-
-  function rain() {
-    ctx.fillStyle = "rgba(7,17,31,0.16)";
-    ctx.fillRect(0, 0, W, H);
-    for (let i = 0; i < cols; i++) {
-      const d = drops[i];
-      const size = 8 + d.z * 8;
-      ctx.font = size + "px monospace";
-      const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
-      const x = i * 16;
-      ctx.fillStyle = "rgba(180,255,200," + (0.35 + d.z * 0.5) + ")";
-      ctx.fillText(ch, x, d.y);
-      ctx.fillStyle = "rgba(34,197,94," + (0.2 + d.z * 0.3) + ")";
-      ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], x, d.y - size);
-      d.y += size * 0.55 * d.z + 1.5;
-      if (d.y > H && Math.random() > 0.975) d.y = Math.random() * -80;
-    }
-  }
-
-  function globe() {
-    const R = Math.min(W, H) * 0.26;
-    const cx = W * 0.5, cy = H * 0.5, f = 3;
-    angY += 0.006 + mx * 0.01;
-    angX += (0.35 + my * 0.5 - angX) * 0.05;
-    const cY = Math.cos(angY), sY = Math.sin(angY);
-    const cX = Math.cos(angX), sX = Math.sin(angX);
-
-    const p = pts.map(function (v) {
-      let x = v[0] * cY - v[2] * sY;
-      let z = v[0] * sY + v[2] * cY;
-      let y = v[1] * cX - z * sX;
-      z = v[1] * sX + z * cX;
-      const s = f / (f + z);
-      return { x: cx + x * R * s, y: cy + y * R * s, z: z, s: s, x3: x, y3: y };
-    });
-
-    ctx.lineWidth = 1;
-    for (let i = 0; i < p.length; i++) {
-      for (let j = i + 1; j < p.length; j++) {
-        const dx = p[i].x3 - p[j].x3, dy = p[i].y3 - p[j].y3, dz = p[i].z - p[j].z;
-        if (dx * dx + dy * dy + dz * dz < 0.28) {
-          const a = 0.1 + (1 - (p[i].z + p[j].z + 2) / 4) * 0.35;
-          ctx.strokeStyle = "rgba(34,255,140," + a + ")";
-          ctx.beginPath(); ctx.moveTo(p[i].x, p[i].y); ctx.lineTo(p[j].x, p[j].y); ctx.stroke();
-        }
-      }
-    }
-    p.forEach(function (q) {
-      const a = 0.35 + (1 - (q.z + 1) / 2) * 0.65;
-      ctx.fillStyle = "rgba(120,255,190," + a + ")";
-      ctx.beginPath(); ctx.arc(q.x, q.y, 1 + q.s * 1.4, 0, 7); ctx.fill();
-    });
-
-    // rotating scan ring
-    ctx.strokeStyle = "rgba(0,217,255,0.35)";
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, R * 1.25, R * 1.25 * Math.abs(Math.sin(angY * 0.7)) * 0.4 + 6, angY, 0, 7);
-    ctx.stroke();
-  }
-
-  function frame() {
-    rain();
-    globe();
-    if (!reduce) requestAnimationFrame(frame);
-  }
-  frame();
-})();
-</script>
-
-</body>
-</html>
+  document.getElementById("publicStatsCard").classList.tog
