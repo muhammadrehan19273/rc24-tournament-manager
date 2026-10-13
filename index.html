@@ -130,7 +130,7 @@ button,input,select,textarea{font-family:inherit}
 button,input:not([type=checkbox]),select{font-size:16px}
 button.small,.linkbtn{font-size:14px}
 #authScreen .btn-row button,#registerBox>button{font-size:13px;padding:4px 12px;min-height:30px}
-#truck-loader{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(circle at 50% 40%,#10294a,#061321 60%,#01040a);color:#e9fbff;transition:opacity .6s ease,visibility .6s ease;cursor:pointer}
+#truck-loader{position:fixed;top:0;left:0;right:0;bottom:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(circle at 50% 40%,#10294a,#061321 60%,#01040a);color:#e9fbff;transition:opacity .6s ease,visibility .6s ease;cursor:pointer}
 #truck-loader.tl-hide{opacity:0;visibility:hidden;pointer-events:none}
 .tl-title{font-weight:800;letter-spacing:.14em;font-size:clamp(20px,6vw,28px);text-shadow:0 0 14px #0ea5e9aa}
 .tl-sub{margin-top:-14px;font-size:11px;letter-spacing:.3em;color:#7dd3fc}
@@ -140,7 +140,7 @@ button.small,.linkbtn{font-size:14px}
 .tl-wheel{transform-box:fill-box;transform-origin:center;animation:tlSpin .45s linear infinite}
 .tl-road{position:absolute;left:0;right:0;bottom:0;height:9px;border-radius:6px;background:#1e293b;overflow:hidden}
 .tl-fill{position:absolute;left:0;top:0;bottom:0;width:calc(var(--p) * 100%);border-radius:6px;background:linear-gradient(90deg,#0ea5e9,#38bdf8,#a78bfa)}
-.tl-dash{position:absolute;inset:3px 0 auto 0;height:3px;background:repeating-linear-gradient(90deg,#ffffff55 0 10px,transparent 10px 22px);animation:tlRoad .4s linear infinite;opacity:.55}
+.tl-dash{position:absolute;top:3px;left:0;right:0;height:3px;background:repeating-linear-gradient(90deg,#ffffff55 0 10px,transparent 10px 22px);animation:tlRoad .4s linear infinite;opacity:.55}
 .tl-speed{position:absolute;left:calc((100% - 112px) * var(--p) - 30px);bottom:30px;width:34px;height:20px}
 .tl-speed i{position:absolute;right:0;height:2px;border-radius:2px;background:#7dd3fc;opacity:.6;animation:tlLine .35s linear infinite}
 .tl-speed i:nth-child(1){top:2px;width:22px}.tl-speed i:nth-child(2){top:9px;width:30px;animation-delay:.12s}.tl-speed i:nth-child(3){top:16px;width:18px;animation-delay:.22s}
@@ -162,7 +162,7 @@ button.small,.linkbtn{font-size:14px}
 #menuBtn.open span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
 #topTitle{flex:1;font-size:18px;font-weight:800;color:#f1f5f9;letter-spacing:.02em}
 .tb-brand{font-size:13px;font-weight:700;color:#7dd3fc;letter-spacing:.12em}
-#navOverlay{position:fixed;inset:0;z-index:150;background:rgba(2,6,14,.62);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s}
+#navOverlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:150;background:rgba(2,6,14,.62);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s}
 #navOverlay.open{opacity:1;pointer-events:auto}
 nav#sideNav{position:fixed;top:0;left:0;bottom:0;z-index:200;width:min(80vw,300px);display:flex;flex-direction:column;flex-wrap:nowrap;gap:6px;overflow-x:hidden;overflow-y:auto;padding:18px 14px;background:linear-gradient(180deg,#0b1a2e,#060f1c);border:0;border-right:1px solid #1f3d5c;border-radius:0 24px 24px 0;box-shadow:14px 0 44px rgba(0,0,0,.6);backdrop-filter:none;transform:translateX(-108%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s .32s}
 nav#sideNav.open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s}
@@ -193,7 +193,7 @@ nav#sideNav.open{transform:none;visibility:visible;transition:transform .32s cub
 #pMenuBtn.open span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
 #pTopTitle{flex:1;font-size:18px;font-weight:800;color:#f1f5f9;letter-spacing:.02em}
 .tb-brand{font-size:13px;font-weight:700;color:#7dd3fc;letter-spacing:.12em}
-#pNavOverlay{position:fixed;inset:0;z-index:150;background:rgba(2,6,14,.62);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s}
+#pNavOverlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:150;background:rgba(2,6,14,.62);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .3s}
 #pNavOverlay.open{opacity:1;pointer-events:auto}
 nav#pSideNav{position:fixed;top:0;left:0;bottom:0;z-index:200;width:min(80vw,300px);display:flex;flex-direction:column;flex-wrap:nowrap;gap:6px;overflow-x:hidden;overflow-y:auto;padding:18px 14px;background:linear-gradient(180deg,#0b1a2e,#060f1c);border:0;border-right:1px solid #1f3d5c;border-radius:0 24px 24px 0;box-shadow:14px 0 44px rgba(0,0,0,.6);backdrop-filter:none;transform:translateX(-108%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s .32s}
 nav#pSideNav.open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s}
@@ -850,6 +850,7 @@ window.forgotPassword=async function(){
 /* AUTH STATE */
 onAuthStateChanged(auth, async user=>{
   currentUser=user;
+  if(!isPublicView && window.appReady)window.appReady();
   if(isPublicView)return; // do not show login/app screens on the public page
   if(user){
     if(celebrateLogin){
@@ -2217,6 +2218,7 @@ function showPublicError(text){
   document.getElementById("publicScreen").classList.remove("hidden");
   document.getElementById("publicTitle").textContent="RC24 Tournament";
   document.getElementById("publicInfo").textContent=text;
+  if(window.appReady)window.appReady();
 }
 
 /* PUBLIC MENU */
@@ -2286,7 +2288,4 @@ function renderPublic(t){
     matchesBox.appendChild(div);
   });
 
-  document.getElementById("publicPoints").innerHTML=pointsTablesHTML(t);
-
-  const hasCards=(t.matches || []).some(m=>!isUnplayed(m.type));
-  document.getElementById("publicStatsCard").classList.tog
+  document.getElementById("pub
